@@ -1,9 +1,14 @@
 import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+<<<<<<< HEAD
 import { APP_PIPE } from '@nestjs/core';
+=======
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+>>>>>>> feat-#3
 @Module({
-  imports: [],
+  imports: [TypeOrmModule.forRoot()], // ormconfig.json값을 가져옴
   controllers: [AppController],
   providers: [
     AppService,
