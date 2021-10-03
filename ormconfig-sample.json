@@ -2,7 +2,9 @@
   "type": "mysql",
   "host": "localhost",
   "port": 3306,
-  "user": "root",
-  "password": "root",
-  "database": "project_db"
+  "username": "root",
+  "password": "password",
+  "database": "database_name",
+  "entities": ["src/**/*.entity{.ts,.js}"],
+  "synchronize": true
 }
