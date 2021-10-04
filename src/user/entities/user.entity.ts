@@ -5,8 +5,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  OneToOne,
-  JoinColumn,
   ManyToOne,
 } from 'typeorm';
 import { UserLevel } from './user_level.entity';
