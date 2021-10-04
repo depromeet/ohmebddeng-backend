@@ -5,7 +5,7 @@ import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [TypeOrmModule.forRoot()], // ormconfig.json값을 가져옴
+  imports: [TypeOrmModule.forRoot({ autoLoadEntities: true })], // ormconfig.json값을 가져옴
   controllers: [AppController],
   providers: [
     AppService,
