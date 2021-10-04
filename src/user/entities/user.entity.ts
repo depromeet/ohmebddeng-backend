@@ -12,7 +12,7 @@ import { UserLevel } from './user_level.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn({ type: 'bigint' })
-  id: number;
+  id: string;
 
   @Column({ nullable: true })
   anonymousId: string;
