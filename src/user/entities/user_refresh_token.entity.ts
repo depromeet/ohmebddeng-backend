@@ -9,7 +9,7 @@ export class UserRefreshToken {
   @Column({ type: 'datetime' })
   expireAt: Date;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { nullable: false })
   @JoinColumn()
   user: number;
 }

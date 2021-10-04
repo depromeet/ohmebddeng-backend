@@ -14,7 +14,7 @@ import { TasteTag } from './taste_tag.entity';
 
 @Entity()
 export class Review {
-  @ManyToOne(() => FoodLevel)
+  @ManyToOne(() => FoodLevel, { nullable: false })
   hotLevel: FoodLevel;
 
   @Column({ nullable: true })
