@@ -21,13 +21,13 @@ export class Food {
   name: string;
 
   @CreateDateColumn({ type: 'datetime' })
-  createdAt: string;
+  createdAt: Date;
 
   @UpdateDateColumn({ type: 'datetime' })
-  updatedAt: string;
+  updatedAt: Date;
 
   @DeleteDateColumn({ type: 'datetime' })
-  deletedAt: string;
+  deletedAt: Date;
 
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
