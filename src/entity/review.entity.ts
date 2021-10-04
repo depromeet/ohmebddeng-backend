@@ -1,3 +1,4 @@
+import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   Entity,
@@ -7,6 +8,7 @@ import {
   DeleteDateColumn,
   ManyToMany,
 } from 'typeorm';
+import { Food } from './food.entity';
 import { FoodLevel } from './food_level.entity';
 import { TasteTag } from './taste_tag.entity';
 
@@ -33,4 +35,12 @@ export class Review {
   // 하나의 리뷰에 맛에 대한 여러 맛평가 태그가 포함될 수 있어, ManyToMany로 설정함.
   @ManyToMany(() => TasteTag)
   tasteReviews: TasteTag[];
+
+  // Food
+  @ManyToOne(() => Food, { primary: true })
+  food: Food;
+
+  // User
+  @ManyToOne(() => User, { primary: true })
+  user: User;
 }
