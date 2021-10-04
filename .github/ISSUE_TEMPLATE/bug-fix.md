@@ -1,8 +1,8 @@
 ---
-name: Feature Develop
-about: 기능 개발 템플릿
-title: '[Feature Develop]'
-labels: Feature Develop
+name: Fix Bug
+about: 버그 픽스 템플릿
+title: '[Fix Bug]'
+labels: Fix Bug
 assignees: ''
 ---
 
