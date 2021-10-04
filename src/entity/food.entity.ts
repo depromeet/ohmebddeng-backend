@@ -14,7 +14,7 @@ import { Restaurant } from './restaurant.entity';
 
 @Entity()
 export class Food {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
   @Column()

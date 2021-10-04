@@ -12,7 +12,7 @@ import { Category } from './category.entity';
 
 @Entity()
 export class Restaurant {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
   @Column()

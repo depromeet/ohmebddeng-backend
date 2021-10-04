@@ -9,7 +9,7 @@ import {
 
 @Entity()
 export class TasteTag {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
   @Column()

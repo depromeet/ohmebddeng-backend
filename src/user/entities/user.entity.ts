@@ -11,7 +11,7 @@ import { UserLevel } from './user_level.entity';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
   @Column({ nullable: true })
