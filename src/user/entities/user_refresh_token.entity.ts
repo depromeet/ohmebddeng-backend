@@ -11,5 +11,5 @@ export class UserRefreshToken {
 
   @OneToOne(() => User, { nullable: false })
   @JoinColumn()
-  user: number;
+  user: User;
 }

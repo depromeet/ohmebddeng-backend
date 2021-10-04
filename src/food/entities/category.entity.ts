@@ -7,6 +7,7 @@ export class Category {
 
   @Column()
   name: string;
+
   @Column({ nullable: true })
   imageUrl: string;
 }
