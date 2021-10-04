@@ -53,6 +53,6 @@ export class Restaurant {
 
   // 하나의 음식점이 여러 카테고리, [ex) 국대떡볶이 => 한식, 분식]에 속할 수 있다고 가정
   @ManyToMany(() => Category)
-  @JoinTable()
+  @JoinTable({ name: 'restaurant_category' })
   categories: Category[];
 }
