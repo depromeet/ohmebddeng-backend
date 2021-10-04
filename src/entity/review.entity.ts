@@ -8,8 +8,8 @@ import {
   DeleteDateColumn,
   ManyToMany,
 } from 'typeorm';
-import { Food } from './food.entity';
-import { FoodLevel } from './food_level.entity';
+import { Food } from '../food/entities/food.entity';
+import { FoodLevel } from '../food/entities/food_level.entity';
 import { TasteTag } from './taste_tag.entity';
 
 @Entity()
