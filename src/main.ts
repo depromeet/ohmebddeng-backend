@@ -17,6 +17,11 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, swagger);
 
   await app.listen(port);
-  app.useGlobalPipes(new ValidationPipe());
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      disableErrorMessages: true,
+    }),
+  );
 }
 bootstrap();
