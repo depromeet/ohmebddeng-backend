@@ -21,8 +21,8 @@ export class UserController {
     return this.userService.createAnonymousUser();
   }
 
-  @Get()
-  async getUser(): Promise<User> {
-    return;
+  @Get(':anonymousId')
+  async getUser(@Param() params): Promise<User> {
+    return this.userService.findUser(params.anonymousId);
   }
 }

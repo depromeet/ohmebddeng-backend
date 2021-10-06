@@ -22,6 +22,10 @@ export class UserService {
   }
 
   findUser(anonymousId: string): Promise<User> {
-    return;
+    return this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userLevel', 'userLevel')
+      .where('user.anonymousId = :anonymousId', { anonymousId })
+      .getOne();
   }
 }
