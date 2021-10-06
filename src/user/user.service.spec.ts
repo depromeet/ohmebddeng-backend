@@ -3,7 +3,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 import { uuidValidateV4 } from './utils/uuid-validate-v4';
-
 class MockRepository {
   async save(user: User) {
     return user;
@@ -29,7 +28,7 @@ describe('UserService', () => {
 
   describe('createAnonymousUser', () => {
     it('should be defined', () => {
-      expect(service).toBeDefined();
+      expect(service.createAnonymousUser).toBeDefined();
     });
 
     it('shoud not throw any error', async () => {
@@ -40,5 +39,15 @@ describe('UserService', () => {
       const result = await service.createAnonymousUser();
       expect(uuidValidateV4(result.anonymousId)).toBe(true);
     });
+  });
+
+  describe('findUser', () => {
+    it('should be defined', () => {
+      expect(service.findUser).toBeDefined();
+    });
+
+    it.todo('shoud not throw any error');
+
+    it.todo('should return a matched user');
   });
 });

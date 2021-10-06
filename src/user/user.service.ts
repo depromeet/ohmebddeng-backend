@@ -20,4 +20,8 @@ export class UserService {
     const { anonymousId } = await this.userRepository.save(user);
     return { anonymousId };
   }
+
+  findUser(anonymousId: string): Promise<User> {
+    return;
+  }
 }
