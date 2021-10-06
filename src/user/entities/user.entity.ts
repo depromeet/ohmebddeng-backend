@@ -58,7 +58,7 @@ export class User {
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   role: string;
 
   @ManyToOne(() => UserLevel)
