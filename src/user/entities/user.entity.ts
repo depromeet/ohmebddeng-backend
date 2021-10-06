@@ -1,3 +1,4 @@
+import { Review } from 'src/review/entities/review.entity';
 import {
   Entity,
   Column,
@@ -6,6 +7,7 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { UserLevel } from './user_level.entity';
 
@@ -61,4 +63,8 @@ export class User {
 
   @ManyToOne(() => UserLevel)
   userLevel!: UserLevel;
+
+  // review
+  @OneToMany(() => Review, (review) => review.user)
+  reviews: Review[];
 }
