@@ -28,4 +28,14 @@ export class ReviewService {
       .where('review.foodId = :foodId', { foodId })
       .getOne();
   }
+
+  findReviewByuserId(userId: number) {
+    return this.reviewRepository
+      .createQueryBuilder('review')
+      .leftJoinAndSelect('review.food', 'food')
+      .leftJoinAndSelect('review.user', 'user')
+      .leftJoinAndSelect('review.hotLevel', 'hotLevel')
+      .where('review.userId = :userId', { userId })
+      .getOne();
+  }
 }

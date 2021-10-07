@@ -5,7 +5,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToMany,
 } from 'typeorm';
+
 
 @Entity()
 export class TasteTag {

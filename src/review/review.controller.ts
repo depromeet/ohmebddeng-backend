@@ -12,8 +12,14 @@ export class ReviewController {
     return this.reviewService.create(createReviewDto);
   }
 
-  @Get(':foodId')
-  findOne(@Param() params) {
+  @Get('food/:foodId')
+  findOnebyfood(@Param() params) {
     return this.reviewService.findReviewByfoodId(params.foodId);
   }
+
+  @Get('user/:userId')
+  findOnebyuser(@Param() params) {
+    return this.reviewService.findReviewByuserId(params.userId);
+  }
+
 }
