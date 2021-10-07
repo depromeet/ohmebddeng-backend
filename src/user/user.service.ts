@@ -20,4 +20,12 @@ export class UserService {
     const { anonymousId } = await this.userRepository.save(user);
     return { anonymousId };
   }
+
+  findUser(anonymousId: string): Promise<User> {
+    return this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userLevel', 'userLevel')
+      .where('user.anonymousId = :anonymousId', { anonymousId })
+      .getOne();
+  }
 }

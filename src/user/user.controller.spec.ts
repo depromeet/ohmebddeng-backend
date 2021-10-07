@@ -39,7 +39,7 @@ describe('UserController', () => {
 
   describe('getAnonymousId', () => {
     it('should be defined', () => {
-      expect(controller).toBeDefined();
+      expect(controller.getAnonymousId).toBeDefined();
     });
 
     it('should return a valid uuidv4', async () => {
@@ -48,5 +48,13 @@ describe('UserController', () => {
       const { anonymousId } = await controller.getAnonymousId();
       expect(uuidValidateV4(anonymousId)).toBe(true);
     });
+  });
+
+  describe('getUser', () => {
+    it('should be defined', () => {
+      expect(controller.getUser).toBeDefined();
+    });
+
+    it.todo('should return matched user');
   });
 });
