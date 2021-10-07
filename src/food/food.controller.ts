@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { FoodService } from './food.service';
 import { Food } from './entities/food.entity';
 
@@ -9,12 +9,12 @@ export class FoodController {
   }
 
   @Get('/reviews')
-  async reviewFoodList(): Promise<Food[]> {
-    return this.foodService.findReviewFoods();
+  async reviewFoodList(@Query('size') size): Promise<Food[]> {
+    return this.foodService.findReviewFoods(size);
   }
 
   @Get('/tests')
-  async testFoodList(): Promise<Food[]> {
-    return this.foodService.findTestFoods();
+  async testFoodList(@Query('size') size): Promise<Food[]> {
+    return this.foodService.findTestFoods(size);
   }
 }

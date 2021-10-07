@@ -12,12 +12,12 @@ export class FoodService {
     this.foodRepository = foodRepository;
   }
 
-  async findReviewFoods(): Promise<Food[]> {
-    const foodList = await this.foodRepository.find();
+  async findReviewFoods(size): Promise<Food[]> {
+    const foodList = await this.foodRepository.find(size);
     return foodList;
   }
 
-  async findTestFoods(): Promise<Food[]> {
-    return await this.foodRepository.find();
+  async findTestFoods(size): Promise<Food[]> {
+    return await this.foodRepository.find(size);
   }
 }
