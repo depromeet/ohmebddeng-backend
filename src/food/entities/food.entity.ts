@@ -1,3 +1,4 @@
+import { Review } from 'src/review/entities/review.entity';
 import {
   Column,
   Entity,
@@ -8,6 +9,7 @@ import {
   ManyToMany,
   JoinTable,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { Category } from './category.entity';
 import { Restaurant } from './restaurant.entity';
@@ -41,6 +43,11 @@ export class Food {
   categories: Category[];
 
   // 한 음식점에 여러 음식이 속할 수 있다고 가정
-  @ManyToOne(() => Restaurant)
+  // restaurant
+  @ManyToOne((type) => Restaurant, (restaurant) => restaurant.foods)
   restaurant: Restaurant;
+
+  // review
+  @OneToMany((type) => Review, (review) => review.food)
+  reviews: Review[];
 }

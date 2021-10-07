@@ -7,8 +7,10 @@ import {
   JoinTable,
   ManyToMany,
   PrimaryGeneratedColumn,
+  OneToMany,
 } from 'typeorm';
 import { Category } from './category.entity';
+import { Food } from './food.entity';
 
 @Entity()
 export class Restaurant {
@@ -55,4 +57,8 @@ export class Restaurant {
   @ManyToMany(() => Category)
   @JoinTable({ name: 'restaurant_category' })
   categories: Category[];
+
+  // food
+  @OneToMany((type) => Food, (food) => food.restaurant)
+  foods: Food[];
 }
