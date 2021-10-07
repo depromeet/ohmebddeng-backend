@@ -22,15 +22,10 @@ export class ReviewService {
   findReviewByfoodId(foodId: number) {
     return this.reviewRepository
       .createQueryBuilder('review')
+      .leftJoinAndSelect('review.food', 'food')
+      .leftJoinAndSelect('review.user', 'user')
+      .leftJoinAndSelect('review.hotLevel', 'hotLevel')
       .where('review.foodId = :foodId', { foodId })
       .getOne();
-  }
-
-  update(id: number, updateReviewDto: UpdateReviewDto) {
-    return `This action updates a #${id} review`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} review`;
   }
 }

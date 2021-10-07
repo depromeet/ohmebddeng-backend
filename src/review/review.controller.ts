@@ -16,15 +16,4 @@ export class ReviewController {
   findOne(@Param() params) {
     return this.reviewService.findReviewByfoodId(params.foodId);
   }
-
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
-    return this.reviewService.update(+id, updateReviewDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reviewService.remove(+id);
-  }
 }
