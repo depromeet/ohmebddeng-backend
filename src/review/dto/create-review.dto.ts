@@ -8,19 +8,8 @@ import { User } from '../../user/entities/user.entity';
 export class CreateReviewDto 
 {
 
-    hotLevel: FoodLevel;
-    @IsString()
-    //imageUrl: string;
-    //@IsDate()
-    createdAt: Date;
-    //@IsDate()
-    updatedAt: Date;
-    //@IsDate()
-    deletedAt: Date;
+    hotLevelId : FoodLevel;
     @IsBoolean()
-    isDeleted: boolean;
-
-    tasteReviews: TasteTag[];
 
     food: Food;
 

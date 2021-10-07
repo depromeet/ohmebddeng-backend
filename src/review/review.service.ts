@@ -19,13 +19,11 @@ export class ReviewService {
     //this.review.push(createReviewDto);
   }
 
-  findAll(){
-    return this.reviewRepository.find();
-  }
-
-  findOne(id: number) {
-    //return this.reviewRepository.findOne(id);
-    return `This action updates a #${id} review`
+  findReviewByfoodId(foodId: number) {
+    return this.reviewRepository
+      .createQueryBuilder('review')
+      .where('review.foodId = :foodId', { foodId })
+      .getOne();
   }
 
   update(id: number, updateReviewDto: UpdateReviewDto) {
