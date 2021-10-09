@@ -25,8 +25,9 @@ export class ReviewService {
       .leftJoinAndSelect('review.food', 'food')
       .leftJoinAndSelect('review.user', 'user')
       .leftJoinAndSelect('review.hotLevel', 'hotLevel')
+      .leftJoinAndSelect('review.tasteReviews', 'review_taste_tag')
       .where('review.foodId = :foodId', { foodId })
-      .getOne();
+      .getMany();
   }
 
   findReviewByuserId(userId: number) {
@@ -35,6 +36,8 @@ export class ReviewService {
       .leftJoinAndSelect('review.food', 'food')
       .leftJoinAndSelect('review.user', 'user')
       .leftJoinAndSelect('review.hotLevel', 'hotLevel')
+      .leftJoinAndSelect('review.tasteReviews', 'review_taste_tag')
       .where('review.userId = :userId', { userId })
+      .getMany();
   }
 }
