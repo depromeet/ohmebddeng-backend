@@ -13,4 +13,7 @@ export class UserLevel {
 
   @Column({ nullable: true })
   description: string;
+
+  @Column()
+  level: number;
 }

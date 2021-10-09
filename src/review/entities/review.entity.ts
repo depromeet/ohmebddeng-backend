@@ -39,10 +39,10 @@ export class Review {
   tasteReviews: TasteTag[];
 
   // Food
-  @ManyToOne(() => Food, { primary: true })
+  @ManyToOne(() => Food, (food) => food.reviews, { primary: true })
   food: Food;
 
   // User
-  @ManyToOne(() => User, { primary: true })
+  @ManyToOne(() => User, (user) => user.reviews, { primary: true })
   user: User;
 }

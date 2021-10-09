@@ -7,6 +7,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = 3000;
 
+  const prefix = '/api/v1';
+  app.setGlobalPrefix(prefix);
+
   const config = new DocumentBuilder()
     .setTitle('Mab Master Server API')
     .setDescription('Mab Master API 명세서')
@@ -17,6 +20,11 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, swagger);
 
   await app.listen(port);
-  app.useGlobalPipes(new ValidationPipe());
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      disableErrorMessages: true,
+    }),
+  );
 }
 bootstrap();
