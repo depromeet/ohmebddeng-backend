@@ -16,7 +16,7 @@ export class ReviewService {
   review: Review[] = [] ;
 
   createOneReview(createReviewDto: CreateReviewDto) {
-    //return this.reviewRepository.save(createReviewDto);
+    return this.reviewRepository.save(createReviewDto as any);
   }
 
   findReviewByfoodId(foodId: number) {
