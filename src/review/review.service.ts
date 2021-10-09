@@ -30,7 +30,7 @@ export class ReviewService {
       .getMany();
   }
 
-  findReviewByuserId(userId: number) {
+  findReviewByUserId(userId: number) {
     return this.reviewRepository
       .createQueryBuilder('review')
       .leftJoinAndSelect('review.food', 'food')
