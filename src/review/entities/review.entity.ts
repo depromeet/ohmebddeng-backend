@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Food } from '../../food/entities/food.entity';
 import { FoodLevel } from '../../food/entities/food_level.entity';
@@ -33,7 +34,8 @@ export class Review {
   isDeleted: boolean;
 
   // 하나의 리뷰에 맛에 대한 여러 맛평가 태그가 포함될 수 있어, ManyToMany로 설정함.
-  @ManyToMany(() => TasteTag)
+  @ManyToMany(() => TasteTag, {nullable: false})
+  @JoinTable({ name: 'review_taste_tag'})
   tasteReviews: TasteTag[];
 
   // Food

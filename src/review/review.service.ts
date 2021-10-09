@@ -15,8 +15,8 @@ export class ReviewService {
 
   review: Review[] = [] ;
 
-  create(createReviewDto: CreateReviewDto) {
-    //this.review.push(createReviewDto);
+  createOneReview(createReviewDto: CreateReviewDto) {
+    //return this.reviewRepository.save(createReviewDto);
   }
 
   findReviewByfoodId(foodId: number) {
@@ -36,6 +36,5 @@ export class ReviewService {
       .leftJoinAndSelect('review.user', 'user')
       .leftJoinAndSelect('review.hotLevel', 'hotLevel')
       .where('review.userId = :userId', { userId })
-      .getOne();
   }
 }
