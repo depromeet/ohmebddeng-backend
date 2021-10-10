@@ -34,7 +34,7 @@ export class Review {
   isDeleted: boolean;
 
   // 하나의 리뷰에 맛에 대한 여러 맛평가 태그가 포함될 수 있어, ManyToMany로 설정함.
-  @ManyToMany(() => TasteTag, {nullable: true})
+  @ManyToMany(() => TasteTag, {nullable: false})
   @JoinTable({ name: 'review_taste_tag'})
   tasteReviews: TasteTag[];
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { Review }  from './entities/review.entity'
+import { Review } from './entities/review.entity'
 import { FoodLevel } from '../food/entities/food_level.entity'
 import { User } from '../user/entities/user.entity'
 import { Food } from '../food/entities/food.entity'
