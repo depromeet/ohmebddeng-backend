@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { Review } from './entities/review.entity'
+import { Review }  from './entities/review.entity'
 import { FoodLevel } from '../food/entities/food_level.entity'
 import { User } from '../user/entities/user.entity'
 import { Food } from '../food/entities/food.entity'
@@ -15,8 +15,6 @@ export class ReviewService {
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
   ) {}
 
- // review: Review[] = [] ;
-
   async createOneReview(reviewDetails: CreateReviewDto) {
 
     const {hotlevelId, userId, foodId, TagIds} = reviewDetails;
@@ -24,14 +22,15 @@ export class ReviewService {
     review.hotLevel = await getRepository(FoodLevel).findOne(hotlevelId);
     review.user = await getRepository(User).findOne(userId);
     review.food = await getRepository(Food).findOne(foodId);
-    /*
+    review.tasteReviews = [new TasteTag()]; 
+    
     for ( let i = 0; i < TagIds.length ; i++)
     {
       const tag = await getRepository(TasteTag).findOne(TagIds[i]);
-      console.log(tag);
-      review.tasteReviews[0] = tag;
-    }*/
-    return this.reviewRepository.save(review);
+      review.tasteReviews[i] = tag;
+    }
+    //await review.save()
+    return review;
   }
 
   findReviewByfoodId(foodId: number) {

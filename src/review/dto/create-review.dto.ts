@@ -1,7 +1,5 @@
 import internal from "stream";
 import { IsString } from 'class-validator';
-import { OmitType } from '@nestjs/mapped-types';
-import { Review } from '../entities/review.entity'
 
 export class CreateReviewDto 
 {
