@@ -8,14 +8,13 @@ import {
   DeleteDateColumn,
   ManyToMany,
   JoinTable,
-  BaseEntity,
 } from 'typeorm';
 import { Food } from '../../food/entities/food.entity';
 import { FoodLevel } from '../../food/entities/food_level.entity';
 import { TasteTag } from './taste_tag.entity';
 
 @Entity()
-export class Review extends BaseEntity {
+export class Review {
   @ManyToOne(() => FoodLevel, { nullable: false })
   hotLevel: FoodLevel;
 

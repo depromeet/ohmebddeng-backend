@@ -1,10 +1,9 @@
-import internal from "stream";
 import { IsString } from 'class-validator';
 
 export class CreateReviewDto 
 {
     @IsString()
-    hotlevelId: string;
+    hotLevelId: string;
     @IsString()
     userId: string;
     @IsString()

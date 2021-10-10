@@ -12,14 +12,15 @@ import { Repository, getRepository } from 'typeorm';
 @Injectable()
 export class ReviewService {
   constructor(
-    @InjectRepository(Review) private reviewRepository: Repository<Review>,
+    @InjectRepository(Review)
+    private reviewRepository: Repository<Review>,
   ) {}
 
   async createOneReview(reviewDetails: CreateReviewDto) {
 
-    const {hotlevelId, userId, foodId, TagIds} = reviewDetails;
+    const {hotLevelId, userId, foodId, TagIds} = reviewDetails;
     const review = new Review();
-    review.hotLevel = await getRepository(FoodLevel).findOne(hotlevelId);
+    review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
     review.user = await getRepository(User).findOne(userId);
     review.food = await getRepository(Food).findOne(foodId);
     review.tasteReviews = [new TasteTag()]; 
@@ -29,8 +30,10 @@ export class ReviewService {
       const tag = await getRepository(TasteTag).findOne(TagIds[i]);
       review.tasteReviews[i] = tag;
     }
-    //await review.save()
-    return review;
+
+    const result = await this.reviewRepository.save(review)
+
+    return result ;
   }
 
   findReviewByfoodId(foodId: number) {
