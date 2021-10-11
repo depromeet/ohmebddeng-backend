@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
-// import { CreateUserDto } from './dto/create-user.dto';
-// import { UpdateUserDto } from './dto/update-user.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UserLevel } from './entities/user_level.entity';
+import { CreateReviewDto } from 'src/review/dto/create-review.dto';
+import { evaluateUserLevel } from './utils/evaluate-user-level';
 
 @Injectable()
 export class UserService {
@@ -26,6 +27,28 @@ export class UserService {
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userLevel', 'userLevel')
       .where('user.anonymousId = :anonymousId', { anonymousId })
+      .getOne();
+  }
+
+  createUserLevel(params: CreateReviewDto): Promise<Pick<User, 'userLevel'>> {
+    let userLevel: UserLevel;
+    // create review: Call reviewService
+
+    // evaluate User Level
+    userLevel = evaluateUserLevel(params);
+
+    // save userLevel in DB
+    this.userRepository
+      .createQueryBuilder()
+      .insert()
+      .into(User)
+      .values({ userLevel })
+      .execute();
+
+    // return userLevel
+    return this.userRepository
+      .createQueryBuilder('user')
+      .select(['user.userLevel'])
       .getOne();
   }
 }
