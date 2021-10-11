@@ -32,7 +32,8 @@ export class UserService {
 
   createUserLevel(params: CreateReviewDto): Promise<Pick<User, 'userLevel'>> {
     let userLevel: UserLevel;
-    // create review: Call reviewService
+
+    // create review: Call reviewService.save()
 
     // evaluate User Level
     userLevel = evaluateUserLevel(params);
