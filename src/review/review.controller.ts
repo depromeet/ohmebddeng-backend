@@ -12,7 +12,10 @@ export class ReviewController {
     return this.reviewService.createOneReview(createReviewDto);
   }
 
-  
+  @Post('foods')
+  async createManyReviews(@Body() createReviewDto: CreateReviewDto) {
+    //return this.reviewService.createManyReviews(createReviewDto);
+  }
 
   @Get('food/:foodId')
   findOnebyfood(@Param() params) {
