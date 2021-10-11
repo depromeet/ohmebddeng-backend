@@ -2,20 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { Review } from './entities/review.entity'
-<<<<<<< HEAD
 import { FoodLevel } from '../food/entities/food_level.entity'
 import { User } from '../user/entities/user.entity'
 import { Food } from '../food/entities/food.entity'
 import { TasteTag } from '../review/entities/taste_tag.entity'
-=======
->>>>>>> 498d0511ec91a30b67a7a2508abacaabd062adbf
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, getRepository } from 'typeorm';
 
 @Injectable()
 export class ReviewService {
   constructor(
-<<<<<<< HEAD
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
   ) {}
@@ -41,25 +37,6 @@ export class ReviewService {
   }
 
   findReviewByfoodId(foodId: number) {
-    return this.reviewRepository
-      .createQueryBuilder('review')
-      .leftJoinAndSelect('review.food', 'food')
-      .leftJoinAndSelect('review.user', 'user')
-      .leftJoinAndSelect('review.hotLevel', 'hotLevel')
-      .leftJoinAndSelect('review.tasteReviews', 'review_taste_tag')
-=======
-    @InjectRepository(Review) private reviewRepository: Repository<Review>,
-  ) {
-    this.reviewRepository = reviewRepository;
-  }
-
-  review: Review[] = [] ;
-
-  createOneReview(createReviewDto: CreateReviewDto) {
-    //return this.reviewRepository.save(createReviewDto);
-  }
-
-  findReviewByfoodId(foodId: number) {
 
     return this.reviewRepository
       .createQueryBuilder('review')
@@ -68,27 +45,19 @@ export class ReviewService {
       .leftJoin('review.hotLevel', 'hotLevel')
       .leftJoin('review.tasteReviews', 'review_taste_tag')
       .select(['review','food.id', 'food.name', 'user.id', 'hotLevel', 'review_taste_tag.id', 'review_taste_tag.name'])
->>>>>>> 498d0511ec91a30b67a7a2508abacaabd062adbf
       .where('review.foodId = :foodId', { foodId })
       .getMany();
   }
 
-<<<<<<< HEAD
-  findReviewByuserId(userId: number) {
-=======
   findReviewByUserId(userId: number) {
->>>>>>> 498d0511ec91a30b67a7a2508abacaabd062adbf
-    return this.reviewRepository
-      .createQueryBuilder('review')
-      .leftJoinAndSelect('review.food', 'food')
-      .leftJoinAndSelect('review.user', 'user')
-      .leftJoinAndSelect('review.hotLevel', 'hotLevel')
-      .leftJoinAndSelect('review.tasteReviews', 'review_taste_tag')
-<<<<<<< HEAD
-=======
-      .select(['review','food.id', 'food.name', 'user.id', 'hotLevel', 'review_taste_tag.id', 'review_taste_tag.name'])
->>>>>>> 498d0511ec91a30b67a7a2508abacaabd062adbf
-      .where('review.userId = :userId', { userId })
-      .getMany();
-  }
-}
+        return this.reviewRepository
+          .createQueryBuilder('review')
+          .leftJoinAndSelect('review.food', 'food')
+          .leftJoinAndSelect('review.user', 'user')
+          .leftJoinAndSelect('review.hotLevel', 'hotLevel')
+          .leftJoinAndSelect('review.tasteReviews', 'review_taste_tag')
+          .select(['review','food.id', 'food.name', 'user.id', 'hotLevel', 'review_taste_tag.id', 'review_taste_tag.name'])
+          .where('review.userId = :userId', { userId })
+          .getMany();
+      }
+    }
