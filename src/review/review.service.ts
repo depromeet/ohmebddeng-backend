@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Body, Controller, Delete, Get, Param, Post, Res } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { CreateManyReviewDto } from './dto/create-many-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
@@ -33,18 +33,25 @@ export class ReviewService {
     }
 
     const result = await this.reviewRepository.save(review)
-
-    return result ;
+    
+    return await Object.assign({
+      userId: result.user.id,
+      foodId: result.food.id,
+      created_at: result.createdAt
+    });
   }
 
   async createManyReviews(manyreviewDetails: CreateManyReviewDto) {
 
     const { dtoList } = manyreviewDetails;
+    let jbAry = new Array();
     
     for ( let i = 0; i < dtoList.length; i++){
       console.log(dtoList[i]);
-      this.createOneReview(dtoList[i]);
+      const obj = await this.createOneReview(dtoList[i]);
+      jbAry.push(obj);
     }
+    return jbAry
   }
 
   findReviewByfoodId(foodId: number) {
