@@ -20,7 +20,8 @@ export class ReviewController {
 
   @Get('user/:userId')
   findOnebyuser(@Param() params) {
-    return this.reviewService.findReviewByuserId(params.userId);
+    return this.reviewService.findReviewByUserId(params.userId);
   }
-
 }
+
+
