@@ -37,21 +37,22 @@ export class ReviewService {
     return await Object.assign({
       userId: result.user.id,
       foodId: result.food.id,
-      created_at: result.createdAt
     });
   }
 
   async createManyReviews(manyreviewDetails: CreateManyReviewDto) {
 
     const { dtoList } = manyreviewDetails;
-    let jbAry = new Array();
+    let reviews = new Array();
     
     for ( let i = 0; i < dtoList.length; i++){
-      console.log(dtoList[i]);
       const obj = await this.createOneReview(dtoList[i]);
-      jbAry.push(obj);
+      reviews.push(obj);
     }
-    return jbAry
+    return await Object.assign({
+      userId: reviews[1].userId,
+      reviewLength: reviews.length,
+    });
   }
 
   findReviewByfoodId(foodId: number) {
