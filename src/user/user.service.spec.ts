@@ -50,4 +50,8 @@ describe('UserService', () => {
 
     it.todo('should return a matched user');
   });
+
+  describe('createUserLevel', () => {
+    it.todo('should calculate proper user level');
+  });
 });
