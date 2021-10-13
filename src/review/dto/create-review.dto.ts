@@ -9,5 +9,5 @@ export class CreateReviewDto
     @IsString()
     foodId: string;
     @IsString({each: true})
-    TagIds: string[];
+    tagIds: string[];
 }

@@ -19,16 +19,16 @@ export class ReviewService {
 
   async createOneReview(reviewDetails: CreateReviewDto) {
 
-    const {hotLevelId, userId, foodId, TagIds} = reviewDetails;
+    const {hotLevelId, userId, foodId, tagIds} = reviewDetails;
     const review = new Review();
     review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
     review.user = await getRepository(User).findOne(userId);
     review.food = await getRepository(Food).findOne(foodId);
     review.tasteReviews = [new TasteTag()]; 
     
-    for ( let i = 0; i < TagIds.length ; i++)
+    for ( let i = 0; i < tagIds.length ; i++)
     {
-      const tag = await getRepository(TasteTag).findOne(TagIds[i]);
+      const tag = await getRepository(TasteTag).findOne(tagIds[i]);
       review.tasteReviews[i] = tag;
     }
 
@@ -40,18 +40,26 @@ export class ReviewService {
     });
   }
 
-  async createManyReviews(manyreviewDetails: CreateManyReviewDto) {
+  async createManyReviews(reviewListDetails: CreateManyReviewDto) {
 
-    const { dtoList } = manyreviewDetails;
-    let reviews = new Array();
+    const { userId, reviewList } = reviewListDetails;
+    const review = new Review();
+    review.user = await getRepository(User).findOne(userId);
     
-    for ( let i = 0; i < dtoList.length; i++){
-      const obj = await this.createOneReview(dtoList[i]);
-      reviews.push(obj);
+    for ( let i = 0; i < reviewList.length; i++){
+      review.hotLevel = await getRepository(FoodLevel).findOne(reviewList[i].hotLevelId);
+      review.food = await getRepository(Food).findOne(reviewList[i].foodId);
+      review.tasteReviews= [new TasteTag()]; 
+
+      for ( let j = 0; j < reviewList[i].tagIds.length ; j++)
+      {
+        const tag = await getRepository(TasteTag).findOne(reviewList[j].tagIds.length);
+        review.tasteReviews[j] = tag;
+      }
     }
     return await Object.assign({
-      userId: reviews[1].userId,
-      reviewLength: reviews.length,
+      userId: review.user.id,
+      reviewLength: reviewList.length,
     });
   }
 
