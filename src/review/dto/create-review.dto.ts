@@ -1,10 +1,13 @@
-import internal from "stream";
-import { IsString, IsNumber, IsDate, IsBoolean } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class CreateReviewDto 
 {
-    hotlevelId: number;
-    userId: number;
-    foodId: number;
-
+    @IsString()
+    hotLevelId: string;
+    @IsString()
+    userId: string;
+    @IsString()
+    foodId: string;
+    @IsString({each: true})
+    tagIds: string[];
 }

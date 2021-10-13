@@ -10,3 +10,4 @@ export class AppController {
     return this.appService.healthCheck();
   }
 }
+
