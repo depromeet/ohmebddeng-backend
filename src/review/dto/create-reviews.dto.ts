@@ -7,8 +7,9 @@ interface Review {
     tagIds: string[];
 }
 
-export class CreateManyReviewDto 
+export class CreateReviewsDto 
 {
+    @IsString()
     userId: string;
     reviewList: Review[];
 }
