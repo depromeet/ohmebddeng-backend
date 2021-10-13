@@ -31,10 +31,10 @@ export class ReviewService {
 
     const result = await this.reviewRepository.save(review)
     
-    return Object.assign({
+    return {
       userId: result.user.id,
       foodId: result.food.id,
-    });
+    };
   }
 
   async createReviews(reviewsDetails: CreateReviewsDto) {
@@ -53,10 +53,10 @@ export class ReviewService {
       return this.reviewRepository.save(review)
     })
 
-    return Object.assign({
+    return {
       userId: userId,
       reviewLength: reviewList.length,
-    });
+    };
   }
 
   findReviewByfoodId(foodId: number) {
