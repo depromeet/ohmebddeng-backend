@@ -11,6 +11,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { CreateUserLevelDto } from './dto/create-user-level.dto';
 
 @Controller('user')
 export class UserController {
@@ -24,5 +25,10 @@ export class UserController {
   @Get(':anonymousId')
   async getUser(@Param() params): Promise<User> {
     return this.userService.findUser(params.anonymousId);
+  }
+
+  @Post('level')
+  async postUserLevel(@Body() params: CreateUserLevelDto) {
+    return this.userService.createUserLevel(params);
   }
 }
