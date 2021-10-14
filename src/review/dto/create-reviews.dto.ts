@@ -1,16 +1,15 @@
-import { IsString, IsArray} from 'class-validator';
-import { CreateReviewDto } from './create-review.dto'
+import { IsString, IsArray } from 'class-validator';
 
-interface IReview {
-    hotLevelId: string;
-    foodId: string;
-    tagIds: string[];
+export interface IReview {
+  hotLevelId: string;
+  foodId: string;
+  tagIds: string[];
 }
 
-export class CreateReviewsDto 
-{
-    @IsString()
-    userId: string;
-    @IsArray()
-    reviewList: IReview[];
+export class CreateReviewsDto {
+  @IsString()
+  userId: string;
+
+  @IsArray()
+  reviewList: IReview[];
 }
