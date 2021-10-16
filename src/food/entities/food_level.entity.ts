@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Food } from './food.entity';
 
 @Entity()
 export class FoodLevel {
@@ -13,4 +14,8 @@ export class FoodLevel {
 
   @Column({ nullable: true })
   description: string;
+
+  // food
+  @OneToMany((type) => Food, (food) => food.foodLevel)
+  foods: Food[];
 }
