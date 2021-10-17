@@ -4,10 +4,13 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserLevel } from './entities/user_level.entity';
-import { CreateUserLevelDto } from './dto/create-user-level.dto';
+import {
+  CreateUserLevelDto,
+  TemporaryAnswer,
+} from './dto/create-user-level.dto';
 import { Food } from 'src/food/entities/food.entity';
-import { IReview } from 'src/review/dto/create-reviews.dto';
-
+import { EvaluateUserLevel } from './utils/evaluate-user-level';
+import { GetUserLevelDto } from './dto/get-user-level.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -34,16 +37,13 @@ export class UserService {
       .getOne();
   }
 
-  async createUserLevel(
-    params: CreateUserLevelDto,
-    // ): Promise<Pick<User, 'userLevel'>> {
-  ): Promise<any> {
-    let userLevel: UserLevel;
+  async createUserLevel(params: CreateUserLevelDto): Promise<GetUserLevelDto> {
+    let userLevel = new UserLevel();
 
     const { userId, answers } = params;
     // get each food level
     const foodIds = answers.map(({ foodId }) => foodId);
-    const selectedFoods = await this.foodRepository
+    const foodsFoundByIds = await this.foodRepository
       .createQueryBuilder('food')
       .leftJoin('food.foodLevel', 'foodLevel')
       .select(['food.id', 'foodLevel.id'])
@@ -55,7 +55,9 @@ export class UserService {
      * @param foods Food에서 id와 foodLevel만을 발라낸 배열입니다.
      * @returns foodId와 foodLevelId의 배열을 반환합니다. {foodId, foodLevelId}[]
      */
-    const flatSelectedFoods = (foods: Pick<Food, 'id' | 'foodLevel'>[]) => {
+    const generateArrayWithFoodIdAndFoodLevel = (
+      foods: Pick<Food, 'id' | 'foodLevel'>[],
+    ) => {
       return foods.map(({ id, foodLevel }, idx) => ({
         foodId: id,
         foodLevelId: foodLevel.id,
@@ -68,9 +70,9 @@ export class UserService {
      * @param answers foodId와 hotLevelId로 이뤄진 배열
      * @returns foods와 answers를 겹치는 foodId를 기준으로 요소를 합친 배열 { foodLevelId, hotLevelId }
      */
-    const mergeByFoodId = (
+    const mergeFoodsAndAnswersByFoodId = (
       foods: { foodId: string; foodLevelId: string }[],
-      answers: Pick<IReview, 'foodId' | 'hotLevelId'>[],
+      answers: TemporaryAnswer[],
     ) => {
       return foods.map(({ foodId, foodLevelId }) => {
         // answers에서 food와 foodId가 같은 요소를 탐색
@@ -80,27 +82,41 @@ export class UserService {
 
         // 응답(answer)에 일치하는 foodId가 있는 경우에만 반환되는 배열에 추가
         if (matchedAnswer) {
-          return { hotLevelId: matchedAnswer.hotLevelId, foodLevelId };
+          return {
+            hotLevel: matchedAnswer.hotLevel,
+            foodLevelId,
+          };
         }
       });
     };
 
-    return mergeByFoodId(flatSelectedFoods(selectedFoods), answers);
+    // evaluate User Level
+    /**
+     * foodLevelId, hotLevel로 이루어진 배열을 만듭니다
+     */
+    const mergedAnswersWithFoodLevel = mergeFoodsAndAnswersByFoodId(
+      generateArrayWithFoodIdAndFoodLevel(foodsFoundByIds),
+      answers,
+    );
 
-    // // evaluate User Level
+    const evaluateUserLevel = new EvaluateUserLevel(mergedAnswersWithFoodLevel);
+    userLevel.id = evaluateUserLevel.evaluateLevel().toString();
 
-    // // save userLevel in DB
-    // this.userRepository
-    //   .createQueryBuilder()
-    //   .insert()
-    //   .into(User)
-    //   .values({ userLevel })
-    //   .execute();
+    // save userLevel in DB
+    this.userRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({ userLevel })
+      .where('id = :id', { id: userId })
+      .execute();
 
     // // return userLevel
-    // return this.userRepository
-    //   .createQueryBuilder('user')
-    //   .select(['user.userLevel'])
-    //   .getOne();
+    return this.userRepository
+      .createQueryBuilder('user')
+      .leftJoin('user.userLevel', 'userLevel')
+      .select(['user.id', 'userLevel'])
+      .where('user.id = :id', { id: userId })
+      .getOne()
+      .then(({ id: userId, userLevel }) => ({ userId, userLevel }));
   }
 }
