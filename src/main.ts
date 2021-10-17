@@ -11,8 +11,8 @@ async function bootstrap() {
   app.setGlobalPrefix(prefix);
 
   const config = new DocumentBuilder()
-    .setTitle('Mab Master Server API')
-    .setDescription('Mab Master API 명세서')
+    .setTitle('오맵땡 Server API')
+    .setDescription('오맵땡 API 명세서')
     .setVersion('Dev_1.0')
     .build();
 
