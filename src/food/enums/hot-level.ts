@@ -1,0 +1,7 @@
+export enum HOT_LEVEL {
+  EASY = 'EASY',
+  NORMAL = 'NORMAL',
+  HOT = 'HOT',
+  HOTTEST = 'HOTTEST',
+  NEVER_TRIED = 'NEVER_TRIED',
+}
