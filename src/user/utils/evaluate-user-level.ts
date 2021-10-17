@@ -52,7 +52,7 @@ export class EvaluateUserLevel {
     });
 
     this.score = scoreByLevel.reduce((acc, cur, idx) => {
-      if (countByLevel[idx] === 0) return 0;
+      if (countByLevel[idx] === 0) return 0; // padding은 계산하지 않음
 
       return (acc += cur / countByLevel[idx]); // 해당 레벨의 총점을 문항수로 나눈 평균값을 score에 더함
     }, 0);
