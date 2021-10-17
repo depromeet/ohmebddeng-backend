@@ -1,5 +1,6 @@
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Food } from './food.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class FoodLevel {
@@ -22,4 +23,8 @@ export class FoodLevel {
   @Column({ nullable: true })
   @ApiProperty({ description: '음식 레벨 설명', type: String, nullable: true })
   description: string;
+
+  // food
+  @OneToMany((type) => Food, (food) => food.foodLevel)
+  foods: Food[];
 }

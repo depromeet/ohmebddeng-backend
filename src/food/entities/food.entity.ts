@@ -13,6 +13,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Category } from './category.entity';
+import { FoodLevel } from './food_level.entity';
 import { Restaurant } from './restaurant.entity';
 
 @Entity()
@@ -58,6 +59,9 @@ export class Food {
     nullable: false,
   })
   categories: Category[];
+
+  @ManyToOne((type) => FoodLevel, (foodLevel) => foodLevel.foods)
+  foodLevel: FoodLevel;
 
   // 한 음식점에 여러 음식이 속할 수 있다고 가정
   // restaurant
