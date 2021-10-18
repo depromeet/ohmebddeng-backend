@@ -1,6 +1,6 @@
 import { HOT_LEVEL } from 'src/food/enums/hot-level';
 
-interface ILevelTestParam {
+interface ILevelTest {
   foodLevelId: string;
   hotLevel: HOT_LEVEL;
 }
@@ -8,9 +8,9 @@ interface ILevelTestParam {
 export class EvaluateUserLevel {
   private level: number;
   private score: number = 0;
-  private answers: ILevelTestParam[];
+  private answers: ILevelTest[];
 
-  constructor(answers: ILevelTestParam[]) {
+  constructor(answers: ILevelTest[]) {
     this.answers = answers;
   }
 
