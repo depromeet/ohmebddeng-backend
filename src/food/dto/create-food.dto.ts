@@ -5,5 +5,8 @@ import { Food } from '../entities/food.entity';
 export class CreateFoodDto {
   @IsString()
   @ApiProperty({ description: '음식 이름', type: String })
-  readonly name: string;
+  name: string;
+
+  @IsString()
+  foodLevelId: string;
 }
