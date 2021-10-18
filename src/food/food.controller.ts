@@ -43,9 +43,9 @@ export class FoodController {
     summary: '음식 정보를 저장하는 API',
     description: '새로운 음식 정보를 저장합니다.',
   })
-  async saveFoodInfo(
+  async createFoodInfo(
     @Body() createFoodDto: CreateFoodDto,
   ): Promise<CreateFoodDto> {
-    return this.foodService.saveFoodInfo(createFoodDto);
+    return this.foodService.createFoodInfo(createFoodDto);
   }
 }

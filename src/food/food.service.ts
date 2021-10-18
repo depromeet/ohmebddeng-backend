@@ -12,9 +12,10 @@ export class FoodService {
     private readonly foodRepository: Repository<Food>,
 
     @InjectRepository(FoodLevel)
-    private readonly foodLevelRepository: Repository<FoodLevel>,
+    private foodLevelRepository: Repository<FoodLevel>,
   ) {
     this.foodRepository = foodRepository;
+    this.foodLevelRepository = foodLevelRepository;
   }
 
   async findReviewFoods(size): Promise<Food[]> {
@@ -26,7 +27,7 @@ export class FoodService {
     return await this.foodRepository.find(size);
   }
 
-  async saveFoodInfo(foodDetail: CreateFoodDto): Promise<CreateFoodDto> {
+  async createFoodInfo(foodDetail: CreateFoodDto): Promise<CreateFoodDto> {
     const { name, foodLevelId } = foodDetail;
 
     // foodLevelId을 사용하여 foodLevel 정보를 가져옴
@@ -43,6 +44,10 @@ export class FoodService {
       .into(Food)
       .values([{ name, foodLevel }])
       .execute();
-    return { name: name, foodLevelId: foodLevelId };
+
+    return {
+      name: name,
+      foodLevelId: foodLevelId,
+    };
   }
 }
