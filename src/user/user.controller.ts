@@ -39,6 +39,7 @@ export class UserController {
     summary: '익명 사용자 ID 기반 사용자 정보 조회 API',
     description: '익명 사용자 ID를 기반으로 사용자를 찾아 반환한다',
   })
+  @ApiParam({ name: '사용자ID', type: String })
   @ApiResponse({ description: '익명사용자에 대한 정보를 받는다', type: User })
   async getUser(@Param() params): Promise<User> {
     return this.userService.findUser(params.anonymousId);
