@@ -16,6 +16,7 @@ interface IFoodLevel {
   foodId: string;
   foodLevelId: string;
 }
+import { GetAnonymousUserDto } from './dto/get-anonymous-user.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -26,12 +27,12 @@ export class UserService {
     private readonly foodRepository: Repository<Food>,
   ) {}
 
-  async createAnonymousUser(): Promise<Pick<User, 'anonymousId'>> {
+  async createAnonymousUser(): Promise<GetAnonymousUserDto> {
     const user = new User();
     user.anonymousId = uuidv4();
 
-    const { anonymousId } = await this.userRepository.save(user);
-    return { anonymousId };
+    const { anonymousId, id: userId } = await this.userRepository.save(user);
+    return { anonymousId, userId };
   }
 
   findUser(anonymousId: string): Promise<User> {

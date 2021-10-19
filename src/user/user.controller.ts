@@ -13,21 +13,38 @@ import {
 } from '@nestjs/swagger';
 import { HOT_LEVEL } from 'src/food/enums/hot-level';
 import { UserLevel } from './entities/user_level.entity';
+import { GetAnonymousUserDto } from './dto/get-anonymous-user.dto';
 @Controller('user')
 @ApiTags('사용자 API')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  // 익명 사용자 ID 발급
   @Get('anonymous')
-  async getAnonymousId(): Promise<Pick<User, 'anonymousId'>> {
+  @ApiOperation({
+    summary: '익명 사용자 ID 발급 API',
+    description: '익명 사용자 ID를 생성하고 반환한다',
+  })
+  @ApiResponse({
+    description: '익명사용자 ID를 발급받는다',
+    type: GetAnonymousUserDto,
+  })
+  async getAnonymousId(): Promise<GetAnonymousUserDto> {
     return this.userService.createAnonymousUser();
   }
 
+  // 익명 사용자 ID 기반 사용자 정보 조회
   @Get(':anonymousId')
+  @ApiOperation({
+    summary: '익명 사용자 ID 기반 사용자 정보 조회 API',
+    description: '익명 사용자 ID를 기반으로 사용자를 찾아 반환한다',
+  })
+  @ApiResponse({ description: '익명사용자에 대한 정보를 받는다', type: User })
   async getUser(@Param() params): Promise<User> {
     return this.userService.findUser(params.anonymousId);
   }
 
+  // 사용자 레벨 테스트 제출
   @Post('level')
   @ApiOperation({
     summary: '사용자 레벨테스트 결과 제출 API',
