@@ -11,8 +11,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { HOT_LEVEL } from 'src/food/enums/hot-level';
-import { UserLevel } from './entities/user_level.entity';
 import { GetAnonymousUserDto } from './dto/get-anonymous-user.dto';
 @Controller('user')
 @ApiTags('사용자 API')
@@ -42,7 +40,7 @@ export class UserController {
   @ApiParam({ name: '사용자ID', type: String })
   @ApiResponse({ description: '사용자에 대한 정보를 받는다', type: User })
   async findUser(@Param() params): Promise<User> {
-    return this.userService.findUser(params.anonymousId);
+    return this.userService.findUser(params.userId);
   }
 
   // 사용자 레벨 테스트 제출

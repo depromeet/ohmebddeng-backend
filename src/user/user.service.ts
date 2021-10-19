@@ -35,11 +35,11 @@ export class UserService {
     return { anonymousId, userId };
   }
 
-  findUser(anonymousId: string): Promise<User> {
+  findUser(userId: string): Promise<User> {
     return this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userLevel', 'userLevel')
-      .where('user.anonymousId = :anonymousId', { anonymousId })
+      .where('user.id = :userId', { userId })
       .getOne();
   }
 
