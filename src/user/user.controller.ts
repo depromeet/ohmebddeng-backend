@@ -33,7 +33,7 @@ export class UserController {
     summary: '사용자 레벨테스트 결과 제출 API',
     description: `레벨테스트 응답결과를 제출하고 사용자의 레벨을 받는다. (참고) hotLevel =  "EASY" | "NORMAL" | "HOT" | "HOTTEST"`,
   })
-  @ApiParam({ name: '사용자 레벨테스트 제출', type: CreateUserLevelDto })
+  @ApiBody({ type: CreateUserLevelDto })
   @ApiResponse({
     description: '사용자의 ID와 레벨을 받는다',
     status: 200,
