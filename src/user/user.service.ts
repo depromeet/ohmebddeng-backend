@@ -5,12 +5,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserLevel } from './entities/user_level.entity';
 import {
-  CreateUserLevelDto,
+  updateUserLevelDto,
   TemporaryAnswer,
 } from './dto/create-user-level.dto';
 import { Food } from 'src/food/entities/food.entity';
 import { EvaluateUserLevel } from './utils/evaluate-user-level';
-import { GetUserLevelDto } from './dto/get-user-level.dto';
+import { findUserLevelDto } from './dto/get-user-level.dto';
 
 interface IFoodLevel {
   foodId: string;
@@ -43,7 +43,7 @@ export class UserService {
       .getOne();
   }
 
-  async createUserLevel(params: CreateUserLevelDto): Promise<GetUserLevelDto> {
+  async updateUserLevel(params: updateUserLevelDto): Promise<findUserLevelDto> {
     let userLevel = new UserLevel();
 
     const { userId, answers } = params;

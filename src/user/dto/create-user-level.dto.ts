@@ -23,7 +23,7 @@ export class TemporaryAnswer {
   hotLevel: HOT_LEVEL;
 }
 @ApiExtraModels(UserLevel)
-export class CreateUserLevelDto {
+export class updateUserLevelDto {
   @IsString()
   @ApiProperty({ description: '사용자 id', type: String })
   userId: string;

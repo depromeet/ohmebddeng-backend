@@ -37,22 +37,22 @@ describe('UserController', () => {
     service = module.get<UserService>(UserService);
   });
 
-  describe('getAnonymousId', () => {
+  describe('createAnonymousUser', () => {
     it('should be defined', () => {
-      expect(controller.getAnonymousId).toBeDefined();
+      expect(controller.createAnonymousUser).toBeDefined();
     });
 
     it('should return a valid uuidv4', async () => {
       jest.spyOn(service, 'createAnonymousUser').mockImplementation(mockFn);
 
-      const { anonymousId } = await controller.getAnonymousId();
+      const { anonymousId } = await controller.createAnonymousUser();
       expect(uuidValidateV4(anonymousId)).toBe(true);
     });
   });
 
-  describe('getUser', () => {
+  describe('findUser', () => {
     it('should be defined', () => {
-      expect(controller.getUser).toBeDefined();
+      expect(controller.findUser).toBeDefined();
     });
 
     it.todo('should return matched user');
