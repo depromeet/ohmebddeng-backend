@@ -5,17 +5,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserLevel } from './entities/user_level.entity';
 import {
-  CreateUserLevelDto,
+  updateUserLevelDto,
   TemporaryAnswer,
 } from './dto/create-user-level.dto';
 import { Food } from 'src/food/entities/food.entity';
 import { EvaluateUserLevel } from './utils/evaluate-user-level';
-import { GetUserLevelDto } from './dto/get-user-level.dto';
+import { findUserLevelDto } from './dto/get-user-level.dto';
 
 interface IFoodLevel {
   foodId: string;
   foodLevelId: string;
 }
+import { GetAnonymousUserDto } from './dto/get-anonymous-user.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -26,23 +27,23 @@ export class UserService {
     private readonly foodRepository: Repository<Food>,
   ) {}
 
-  async createAnonymousUser(): Promise<Pick<User, 'anonymousId'>> {
+  async createAnonymousUser(): Promise<GetAnonymousUserDto> {
     const user = new User();
     user.anonymousId = uuidv4();
 
-    const { anonymousId } = await this.userRepository.save(user);
-    return { anonymousId };
+    const { anonymousId, id: userId } = await this.userRepository.save(user);
+    return { anonymousId, userId };
   }
 
-  findUser(anonymousId: string): Promise<User> {
+  findUser(userId: string): Promise<User> {
     return this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userLevel', 'userLevel')
-      .where('user.anonymousId = :anonymousId', { anonymousId })
+      .where('user.id = :userId', { userId })
       .getOne();
   }
 
-  async createUserLevel(params: CreateUserLevelDto): Promise<GetUserLevelDto> {
+  async updateUserLevel(params: updateUserLevelDto): Promise<findUserLevelDto> {
     let userLevel = new UserLevel();
 
     const { userId, answers } = params;
