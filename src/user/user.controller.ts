@@ -13,7 +13,6 @@ import {
 } from '@nestjs/swagger';
 import { HOT_LEVEL } from 'src/food/enums/hot-level';
 import { UserLevel } from './entities/user_level.entity';
-
 @Controller('user')
 @ApiTags('사용자 API')
 export class UserController {
