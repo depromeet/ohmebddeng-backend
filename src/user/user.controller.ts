@@ -2,7 +2,6 @@ import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { CreateUserLevelDto } from './dto/create-user-level.dto';
-<<<<<<< HEAD
 import { GetUserLevelDto } from './dto/get-user-level.dto';
 import {
   ApiBody,
@@ -14,9 +13,7 @@ import {
 } from '@nestjs/swagger';
 import { HOT_LEVEL } from 'src/food/enums/hot-level';
 import { UserLevel } from './entities/user_level.entity';
-=======
 
->>>>>>> 03d1593 (feat: 🎸 컨트롤러 추가)
 @Controller('user')
 @ApiTags('사용자 API')
 export class UserController {
