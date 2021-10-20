@@ -8,5 +8,6 @@ export class CreateFoodDto {
   name: string;
 
   @IsString()
-  foodLevelId: string;
+  @ApiProperty({ description: '음식 레벨', type: String })
+  level: string;
 }

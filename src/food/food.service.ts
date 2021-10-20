@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateFoodDto } from './dto/create-food.dto';
+import { Category } from './entities/category.entity';
 import { Food } from './entities/food.entity';
 import { FoodLevel } from './entities/food_level.entity';
 
@@ -28,13 +29,13 @@ export class FoodService {
   }
 
   async createFoodInfo(foodDetail: CreateFoodDto): Promise<CreateFoodDto> {
-    const { name, foodLevelId } = foodDetail;
+    const { name, level } = foodDetail;
 
     // foodLevelId을 사용하여 foodLevel 정보를 가져옴
     const foodLevel = await this.foodLevelRepository
       .createQueryBuilder('foodLevel')
       .select()
-      .where('foodLevel.id = :foodLevelId', { foodLevelId })
+      .where('foodLevel.id = :foodLevelId', { level })
       .getOne();
 
     this.foodRepository
@@ -47,7 +48,7 @@ export class FoodService {
 
     return {
       name: name,
-      foodLevelId: foodLevelId,
+      level: level,
     };
   }
 }
