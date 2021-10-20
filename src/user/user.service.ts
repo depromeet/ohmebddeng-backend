@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not, IsNull } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserLevel } from './entities/user_level.entity';
 import {
   updateUserLevelDto,
@@ -10,7 +10,7 @@ import {
 } from './dto/create-user-level.dto';
 import { Food } from 'src/food/entities/food.entity';
 import { EvaluateUserLevel } from './utils/evaluate-user-level';
-import { FindUserLevelDto } from './dto/get-user-level.dto';
+import { FindUserLevelDto } from './dto/find-user-level.dto';
 
 interface IFoodLevel {
   foodId: string;
@@ -18,6 +18,7 @@ interface IFoodLevel {
 }
 import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
 import { FindUserCountDto } from './dto/find-user-count.dto';
+import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -115,9 +116,7 @@ export class UserService {
       .then(({ id: userId, userLevel }) => ({ userId, userLevel }));
   }
 
-  async findUserCount(param: {
-    levelTestedOnly: string;
-  }): Promise<FindUserCountDto> {
+  async findUserCount(param: FindUserCountQueryDto): Promise<FindUserCountDto> {
     // query param이라 string으로만 받아짐.
     const levelTestedOnly = param.levelTestedOnly === 'true';
 

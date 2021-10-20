@@ -4,7 +4,7 @@ import { User } from './entities/user.entity';
 import { FindUserCountDto } from './dto/find-user-count.dto';
 
 import { updateUserLevelDto } from './dto/create-user-level.dto';
-import { FindUserLevelDto } from './dto/get-user-level.dto';
+import { FindUserLevelDto } from './dto/find-user-level.dto';
 import {
   ApiBody,
   ApiOperation,
@@ -14,6 +14,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
+import { IsBooleanString } from 'class-validator';
+import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
 @Controller('user')
 @ApiTags('사용자 API')
 export class UserController {
@@ -50,7 +52,7 @@ export class UserController {
     type: FindUserCountDto,
   })
   async findUserCount(
-    @Query() param: { levelTestedOnly: string },
+    @Query() param: FindUserCountQueryDto,
   ): Promise<FindUserCountDto> {
     return this.userService.findUserCount(param);
   }
