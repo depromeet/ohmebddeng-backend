@@ -35,7 +35,7 @@ export class FoodService {
     const foodLevel = await this.foodLevelRepository
       .createQueryBuilder('foodLevel')
       .select()
-      .where('foodLevel.id = :foodLevelId', { level })
+      .where('foodLevel.id = :level', { level })
       .getOne();
 
     this.foodRepository
