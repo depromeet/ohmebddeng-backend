@@ -50,4 +50,16 @@ describe('UserService', () => {
 
     it.todo('should return a matched user');
   });
+
+  describe('createUserLevel', () => {
+    it('should be defined', () => {
+      expect(service.createUserLevel).toBeDefined();
+    });
+
+    it.todo('should be called with createReviewDto');
+
+    it.todo('should create reviews properly');
+    it.todo('should create userLevel Properly');
+    it.todo('should return userLevel properly');
+  });
 });
