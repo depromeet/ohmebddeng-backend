@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 import { UserLevel } from '../entities/user_level.entity';
 
-export class findUserLevelDto {
+export class FindUserLevelDto {
   @IsString()
   @ApiProperty({ description: '사용자 ID' })
   userId: string;
