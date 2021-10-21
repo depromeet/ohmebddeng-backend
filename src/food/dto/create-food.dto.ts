@@ -10,4 +10,8 @@ export class CreateFoodDto {
   @IsString()
   @ApiProperty({ description: '음식 레벨', type: String })
   level: string;
+
+  @IsString()
+  @ApiProperty({ description: '음식 카테고리', type: String })
+  category: string;
 }
