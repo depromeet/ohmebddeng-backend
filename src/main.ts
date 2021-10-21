@@ -7,10 +7,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: {
       origin: [
-        'ohmebddeng.kr',
-        'www.ohmebddeng.kr',
-        'ohmebddeng-frontend.vercel.app',
-        'ohmebddeng-frontend-git-develop-waterplease.vercel.app',
+        'https://ohmebddeng.kr',
+        'https://www.ohmebddeng.kr',
+        'https://ohmebddeng-frontend.vercel.app',
+        'https://ohmebddeng-frontend-git-develop-waterplease.vercel.app',
       ],
     },
   });
