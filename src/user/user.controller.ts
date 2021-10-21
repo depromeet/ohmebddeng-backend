@@ -43,7 +43,7 @@ export class UserController {
   })
   @ApiQuery({
     name: 'levelTestedOnly',
-    type: String,
+    type: FindUserCountQueryDto,
     description: '레벨테스트를 마친 사용자 수만 조회할지 여부',
   })
   @ApiResponse({
