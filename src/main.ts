@@ -12,6 +12,7 @@ async function bootstrap() {
         'https://ohmebddeng-frontend.vercel.app',
         'https://ohmebddeng-frontend-git-develop-waterplease.vercel.app',
       ],
+      credentials: true,
     },
   });
   const port = 3000;
