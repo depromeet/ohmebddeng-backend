@@ -77,9 +77,9 @@ export class FoodService {
       .add(categoryInfo);
 
     return {
-      name: name,
-      level: level,
-      category: category,
+      name,
+      level,
+      category,
     };
   }
 }
