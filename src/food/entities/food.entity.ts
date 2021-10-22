@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { type } from 'os';
 import { Review } from 'src/review/entities/review.entity';
 import {
   Column,
@@ -12,7 +11,6 @@ import {
   JoinTable,
   ManyToOne,
   OneToMany,
-  OneToOne,
 } from 'typeorm';
 import { Category } from './category.entity';
 import { FoodLevel } from './food_level.entity';
