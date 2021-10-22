@@ -13,10 +13,10 @@ export class FoodService {
     private readonly foodRepository: Repository<Food>,
 
     @InjectRepository(FoodLevel)
-    private foodLevelRepository: Repository<FoodLevel>,
+    private readonly foodLevelRepository: Repository<FoodLevel>,
 
     @InjectRepository(Category)
-    private categoryRepository: Repository<Category>,
+    private readonly categoryRepository: Repository<Category>,
   ) {
     this.foodRepository = foodRepository;
     this.foodLevelRepository = foodLevelRepository;
