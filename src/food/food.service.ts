@@ -17,7 +17,13 @@ export class FoodService {
     return foodList;
   }
 
-  async findTestFoods(size): Promise<Food[]> {
-    return await this.foodRepository.find(size);
+  async findTestFoods(): Promise<Food[]> {
+    const food = await this.foodRepository
+      .createQueryBuilder('food')
+      .select()
+      .where('food.isTest = true')
+      .getMany();
+
+    return food;
   }
 }
