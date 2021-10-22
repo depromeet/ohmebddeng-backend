@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { type } from 'os';
 import { Review } from 'src/review/entities/review.entity';
 import {
   Column,
@@ -11,6 +12,7 @@ import {
   JoinTable,
   ManyToOne,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { Category } from './category.entity';
 import { FoodLevel } from './food_level.entity';
@@ -37,6 +39,14 @@ export class Food {
   @DeleteDateColumn({ type: 'datetime' })
   @ApiProperty({ description: '음식 데이터가 삭제 된 일자', type: Date })
   deletedAt: Date;
+
+  @Column({ type: 'boolean', default: false })
+  @ApiProperty({
+    description: '사용자 레벨 테스트 확인용',
+    type: Boolean,
+    default: false,
+  })
+  isTest: boolean;
 
   @Column({ type: 'boolean', default: false })
   @ApiProperty({
