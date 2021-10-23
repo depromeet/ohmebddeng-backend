@@ -10,13 +10,15 @@ import {
 } from './dto/create-user-level.dto';
 import { Food } from 'src/food/entities/food.entity';
 import { EvaluateUserLevel } from './utils/evaluate-user-level';
-import { findUserLevelDto } from './dto/get-user-level.dto';
+import { FindUserLevelDto } from './dto/find-user-level.dto';
 
 interface IFoodLevel {
   foodId: string;
   foodLevelId: string;
 }
-import { GetAnonymousUserDto } from './dto/get-anonymous-user.dto';
+import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
+import { FindUserCountDto } from './dto/find-user-count.dto';
+import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -27,7 +29,7 @@ export class UserService {
     private readonly foodRepository: Repository<Food>,
   ) {}
 
-  async createAnonymousUser(): Promise<GetAnonymousUserDto> {
+  async createAnonymousUser(): Promise<FindAnonymousUserDto> {
     const user = new User();
     user.anonymousId = uuidv4();
 
@@ -43,7 +45,7 @@ export class UserService {
       .getOne();
   }
 
-  async updateUserLevel(params: updateUserLevelDto): Promise<findUserLevelDto> {
+  async updateUserLevel(params: updateUserLevelDto): Promise<FindUserLevelDto> {
     let userLevel = new UserLevel();
 
     const { userId, answers } = params;
@@ -112,5 +114,30 @@ export class UserService {
       .where('user.id = :id', { id: userId })
       .getOne()
       .then(({ id: userId, userLevel }) => ({ userId, userLevel }));
+  }
+
+  async findUserCount(param: FindUserCountQueryDto): Promise<FindUserCountDto> {
+    // query param이라 string으로만 받아짐.
+    const levelTestedOnly = param.levelTestedOnly === 'true';
+
+    if (levelTestedOnly) {
+      return this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.userLevel', 'userLevel')
+        .where('userLevel.id IS NOT NULL')
+        .getCount()
+        .then((count) => ({
+          count,
+          levelTestedOnly,
+        }));
+    }
+
+    return this.userRepository
+      .createQueryBuilder('user')
+      .getCount()
+      .then((count) => ({
+        count,
+        levelTestedOnly,
+      }));
   }
 }
