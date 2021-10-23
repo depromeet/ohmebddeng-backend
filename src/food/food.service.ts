@@ -43,29 +43,31 @@ export class FoodService {
       .getOne();
 
     // food 값 넣기
-    const foodInfo = await this.foodRepository
+    const { id: foodId } = await this.foodRepository
       .createQueryBuilder('food')
       .leftJoin('food.foodLevel', 'foodLevel')
       .insert()
       .into(Food)
-      .values([{ name, foodLevel }])
+      .values({ name, foodLevel })
       .execute()
-      .then((food) => {
-        const foodId = food.identifiers[0].id;
-
-        return this.foodRepository
-          .createQueryBuilder('food')
-          .select()
-          .where('food.id = :foodId', { foodId })
-          .getOne();
+      .then(({ identifiers }) => {
+        if (identifiers.length !== 1) {
+          // 하나의 음식만 추가하였으므로, 반드시 identifiers 길이는 반드시 1
+          throw new Error();
+        }
+        return identifiers.pop();
       });
 
+    console.log(foodId);
+
     //음식의 카테고리를 설정하기 위해서 categoryId값을 가져옴
-    const categoryInfo = await this.categoryRepository
+    const { id: categoryId } = await this.categoryRepository
       .createQueryBuilder('category')
-      .select()
+      .select(['category.id'])
       .where('category.name = :category', { category })
       .getOne();
+
+    console.log(categoryId);
 
     // console.log(categoryInfo);
 
@@ -73,8 +75,8 @@ export class FoodService {
     await this.foodRepository
       .createQueryBuilder('food_category')
       .relation(Food, 'categories')
-      .of(foodInfo)
-      .add(categoryInfo);
+      .of(foodId)
+      .add(categoryId);
 
     return {
       name,
