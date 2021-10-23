@@ -29,17 +29,15 @@ export class FoodService {
   }
 
   async findTestFoods(): Promise<Food[]> {
-    const food = await this.foodRepository
+    return await this.foodRepository
       .createQueryBuilder('food')
-      .select()
+      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
       .where('food.isTest = true')
       .getMany();
-
-    return food;
   }
 
   async createFoodInfo(foodDetail: CreateFoodDto): Promise<CreateFoodDto> {
-    const { name, level, category } = foodDetail;
+    const { name, subName, level, category } = foodDetail;
 
     // foodLevelId을 사용하여 foodLevel 정보를 가져옴
     const foodLevel = await this.foodLevelRepository
@@ -54,7 +52,7 @@ export class FoodService {
       .leftJoin('food.foodLevel', 'foodLevel')
       .insert()
       .into(Food)
-      .values({ name, foodLevel })
+      .values({ name, subName, foodLevel })
       .execute()
       .then(({ identifiers }) => {
         if (identifiers.length !== 1) {
@@ -80,6 +78,7 @@ export class FoodService {
 
     return {
       name,
+      subName,
       level,
       category,
     };

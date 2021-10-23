@@ -34,7 +34,7 @@ export class FoodController {
     description: '테스트에 필요한 음식 리스트를 가져온다.',
   })
   @ApiCreatedResponse({ description: '음식 list', type: Food })
-  async testFoodList(): Promise<Food[]> {
+  async findTestFoodList(): Promise<Food[]> {
     return this.foodService.findTestFoods();
   }
 
