@@ -7,6 +7,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: {
       origin: [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
         'https://ohmebddeng.kr',
         'https://www.ohmebddeng.kr',
         'https://ohmebddeng-frontend.vercel.app',
