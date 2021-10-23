@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
-export class GetAnonymousUserDto {
+export class FindAnonymousUserDto {
   @IsString()
   @ApiProperty({ description: '사용자 id' })
   userId: string;
