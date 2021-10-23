@@ -58,18 +58,12 @@ export class FoodService {
         return identifiers.pop();
       });
 
-    console.log(foodId);
-
     //음식의 카테고리를 설정하기 위해서 categoryId값을 가져옴
     const { id: categoryId } = await this.categoryRepository
       .createQueryBuilder('category')
       .select(['category.id'])
       .where('category.name = :category', { category })
       .getOne();
-
-    console.log(categoryId);
-
-    // console.log(categoryInfo);
 
     // ManyToMany관계 -> 음식 카테고리 지정
     await this.foodRepository
