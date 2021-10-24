@@ -9,12 +9,22 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateFoodDto } from './dto/create-food.dto';
+import { FindFoodsDto } from './dto/find-foods.dto';
 
 @Controller('food')
 @ApiTags('음식 API')
 export class FoodController {
   constructor(private readonly foodService: FoodService) {
     this.foodService = foodService;
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: '음식 리스트를 가져오는 API',
+    description: '사용자 id, category가 주어질 경우 그에 맞는 음식만 가져온다.',
+  })
+  async findFoodsByUserId(@Query() params: FindFoodsDto) {
+    return this.foodService.findFoodsByUserId(params);
   }
 
   @Get('/reviews')
