@@ -1,8 +1,14 @@
-import { IsString, IsArray } from 'class-validator';
+import { IsString, IsArray, IsEnum } from 'class-validator';
+import { HOT_LEVEL } from 'src/food/enums/hot-level';
 
-export interface IReview {
-  hotLevelId: string;
+export class Review {
+  @IsEnum(HOT_LEVEL)
+  hotLevel: HOT_LEVEL;
+
+  @IsString()
   foodId: string;
+
+  @IsString({ each: true })
   tagIds: string[];
 }
 
@@ -11,5 +17,5 @@ export class CreateReviewsDto {
   userId: string;
 
   @IsArray()
-  reviewList: IReview[];
+  reviewList: Review[];
 }

@@ -1,13 +1,16 @@
-import { IsString } from 'class-validator';
+import { IsString, IsEnum } from 'class-validator';
+import { HOT_LEVEL } from 'src/food/enums/hot-level';
 
-export class CreateReviewDto 
-{
-    @IsString()
-    hotLevelId: string;
-    @IsString()
-    userId: string;
-    @IsString()
-    foodId: string;
-    @IsString({each: true})
-    tagIds: string[];
+export class CreateReviewDto {
+  @IsEnum(HOT_LEVEL)
+  hotLevel: HOT_LEVEL;
+
+  @IsString()
+  userId: string;
+
+  @IsString()
+  foodId: string;
+
+  @IsString({ each: true })
+  tagIds: string[];
 }
