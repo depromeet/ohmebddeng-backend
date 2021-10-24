@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getConnection, Repository } from 'typeorm';
 import { CreateFoodDto } from './dto/create-food.dto';
+import { FindFoodsDto } from './dto/find-foods.dto';
 import { Category } from './entities/category.entity';
 import { Food } from './entities/food.entity';
 import { FoodLevel } from './entities/food_level.entity';
@@ -77,5 +78,41 @@ export class FoodService {
       level,
       category,
     };
+  }
+
+  /**
+   * 음식 리스트를 가져옵니다. userId가 주어지면 user의 맵레벨에 맞는 음식들만 필터해 가져옵니다.
+   * category가 주어지면 category에 해당하는 음식들만 필터해 가져옵니다.
+   * userId와 category는 Optional하게 주거나 안 줄 수 있습니다.
+   * 경우에 따라서 user의 맵레벨과 상관없이 특정 카테고리의 모든 음식만 가져오는 API가 필요할 수도 있고,
+   * 전체 음식 리스트를 가져오고 싶은 경우도 있을 수 있기 때문입니다.
+   * @param param userId?: string, category?: string
+   * @returns any
+   */
+  async findFoodsByUserId(param: FindFoodsDto) {
+    const { userId, category } = param;
+    //if User, get user level
+    if (!userId) {
+      // userId 없이 요청이 온 경우
+
+      if (!category) {
+        // userId도 없고, categoryId도 없는 경우
+        return this.foodRepository.createQueryBuilder('food').getMany();
+      }
+
+      // userId만 없는 경우
+      return this.foodRepository
+        .createQueryBuilder('food')
+        .leftJoinAndSelect('food.categories', 'category')
+        .where('category.name = :categoryName', { categoryName: category })
+        .getMany();
+    }
+
+    // if category, get categoryId
+
+    // find foods by user's level & category
+
+    //return
+    return param;
   }
 }
