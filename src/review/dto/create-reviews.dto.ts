@@ -20,6 +20,6 @@ export class CreateReviewsDto {
   userId: string;
 
   @IsArray()
-  @ApiProperty({ description: '리뷰 인터페이스의 배열'})
+  @ApiProperty({ description: '리뮤 클래스의 배열'})
   reviewList: Review[];
 }
