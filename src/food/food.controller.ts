@@ -41,12 +41,11 @@ export class FoodController {
   @Get('/tests')
   @ApiOperation({
     summary: '테스트 음식 리스트를 가져오는 API',
-    description: '테스트에 필요한 음식 리스트를 가쟈온다.',
+    description: '테스트에 필요한 음식 리스트를 가져온다.',
   })
-  @ApiQuery({ name: 'size' })
   @ApiCreatedResponse({ description: '음식 list', type: Food })
-  async testFoodList(@Query('size') size): Promise<Food[]> {
-    return this.foodService.findTestFoods(size);
+  async findTestFoodList(): Promise<Food[]> {
+    return this.foodService.findTestFoods();
   }
 
   @Post()
