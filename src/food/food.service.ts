@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { produceHotLevelId } from 'src/review/utils/produce-hot-level';
 import { getConnection, Repository } from 'typeorm';
 import { CreateFoodDto } from './dto/create-food.dto';
 import { FindFoodsDto } from './dto/find-foods.dto';
@@ -95,27 +96,37 @@ export class FoodService {
    * @returns any
    */
   async findFoodsByUserId(param: FindFoodsDto) {
-    const { userId, category } = param;
-    // userId 없이 요청이 온 경우
-    if (!userId) {
-      // userId도 없고, categoryId도 없는 경우
+    const { category, hotLevel, size: providedSize, shuffle } = param;
+    const size = providedSize ? Number(providedSize) : 10; // default size = 10
+    // hotLevel 없이 요청이 온 경우
+    if (!hotLevel) {
+      // hotLevel 없고, categoryId도 없는 경우
       if (!category) {
-        return this.foodRepository.createQueryBuilder('food').getMany();
+        return this.foodRepository
+          .createQueryBuilder('food')
+          .take(size)
+          .getMany();
       }
 
-      // userId만 없는 경우
+      // hotLevel만 없는 경우
       return this.foodRepository
         .createQueryBuilder('food')
         .leftJoinAndSelect('food.categories', 'category')
         .where('category.name = :categoryName', { categoryName: category })
+        .take(size)
         .getMany();
     }
 
-    // userId가 있는 경우
-    // if category
+    // shuffle === true인 경우 .orderBy("RAND()")
 
-    // if not category
-    //return
-    return param;
+    // hotLevel이 있는 경우
+    const hotLevelId = produceHotLevelId(hotLevel);
+    return this.foodRepository
+      .createQueryBuilder('food')
+      .leftJoinAndSelect('food.foodLevel', 'foodLevel')
+      .where('foodLevel.id = :hotLevelId', { hotLevelId })
+      .take(size)
+      .orderBy('RAND()')
+      .getMany();
   }
 }
