@@ -91,12 +91,10 @@ export class FoodService {
    */
   async findFoodsByUserId(param: FindFoodsDto) {
     const { userId, category } = param;
-    //if User, get user level
+    // userId 없이 요청이 온 경우
     if (!userId) {
-      // userId 없이 요청이 온 경우
-
+      // userId도 없고, categoryId도 없는 경우
       if (!category) {
-        // userId도 없고, categoryId도 없는 경우
         return this.foodRepository.createQueryBuilder('food').getMany();
       }
 
@@ -108,10 +106,10 @@ export class FoodService {
         .getMany();
     }
 
-    // if category, get categoryId
+    // userId가 있는 경우
+    // if category
 
-    // find foods by user's level & category
-
+    // if not category
     //return
     return param;
   }
