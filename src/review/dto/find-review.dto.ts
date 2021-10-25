@@ -1,12 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsArray,  IsEnum } from 'class-validator';
+import { HOT_LEVEL } from 'src/food/enums/hot-level';
+import { Review } from '../entities/review.entity'
 
-export class CreateReviewsResultDto {
-  @IsString()
+
+export class FindReviewDto {
   @ApiProperty({ description: '유저 id'})
-  review: string;
+  review: Review;
 
-  @IsString()
+  @IsEnum(HOT_LEVEL)
   @ApiProperty({ description: '생성된 리뷰 길이'})
-  hotLevel: string;
+  hotLevel: HOT_LEVEL;
+}
+
+export class FindReviewsDto {
+    @IsArray()
+    @ApiProperty({ description: '리뮤 클래스의 배열'})
+    reviewList: Review[];
 }

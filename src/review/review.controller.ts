@@ -5,6 +5,7 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { CreateReviewsDto } from './dto/create-reviews.dto'
 import { CreateReviewResultDto } from './dto/create-review-result.dto'
 import { CreateReviewsResultDto } from './dto/create-reviews-result.dto'
+import { FindReviewsDto } from './dto/find-review.dto'
 import {
   ApiBody,
   ApiResponse,
@@ -52,7 +53,7 @@ export class ReviewController {
     description: '음식 ID를 기반으로 리뷰를 찾아 반환한다',
   })
   @ApiParam({ name: '음식ID', type: String })
-  @ApiResponse({ description: '해당하는 리뷰에 대한 정보를 받는다.'})
+  @ApiResponse({ description: '해당하는 리뷰에 대한 정보를 받는다.', type: FindReviewsDto})
   findOnebyfood(@Param() params) {
     return this.reviewService.findReviewByfoodId(params.foodId);
   }
@@ -63,7 +64,7 @@ export class ReviewController {
     description: '사용자 ID를 기반으로 리뷰를 찾아 반환한다',
   })
   @ApiParam({ name: '사용자ID', type: String })
-  @ApiResponse({ description: '해당하는 리뷰에 대한 정보를 받는다.'})
+  @ApiResponse({ description: '해당하는 리뷰에 대한 정보를 받는다.', type: FindReviewsDto})
   findOnebyuser(@Param() params) {
     return this.reviewService.findReviewByUserId(params.userId);
   }
