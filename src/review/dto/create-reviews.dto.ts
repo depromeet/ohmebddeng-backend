@@ -1,10 +1,11 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-import { IsString, IsArray } from 'class-validator';
+import { IsString, IsArray, IsEnum } from 'class-validator';
+import { HOT_LEVEL } from 'src/food/enums/hot-level';
 
-export class IReview {
-  @IsString()
+export class Review {
+  @IsEnum(HOT_LEVEL)
   @ApiProperty({ description: '음식 레벨 id'})
-  hotLevelId: string;
+  hotLevel: HOT_LEVEL;
   @IsString()
   @ApiProperty({ description: '음식 id'})
   foodId: string;
@@ -20,5 +21,5 @@ export class CreateReviewsDto {
 
   @IsArray()
   @ApiProperty({ description: '리뷰 인터페이스의 배열'})
-  reviewList: IReview[];
+  reviewList: Review[];
 }

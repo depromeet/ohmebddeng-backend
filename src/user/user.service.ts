@@ -10,13 +10,15 @@ import {
 } from './dto/create-user-level.dto';
 import { Food } from 'src/food/entities/food.entity';
 import { EvaluateUserLevel } from './utils/evaluate-user-level';
-import { findUserLevelDto } from './dto/get-user-level.dto';
+import { FindUserLevelDto } from './dto/find-user-level.dto';
 
 interface IFoodLevel {
   foodId: string;
   foodLevelId: string;
 }
-import { GetAnonymousUserDto } from './dto/get-anonymous-user.dto';
+import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
+import { FindUserCountDto } from './dto/find-user-count.dto';
+import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -27,7 +29,7 @@ export class UserService {
     private readonly foodRepository: Repository<Food>,
   ) {}
 
-  async createAnonymousUser(): Promise<GetAnonymousUserDto> {
+  async createAnonymousUser(): Promise<FindAnonymousUserDto> {
     const user = new User();
     user.anonymousId = uuidv4();
 
@@ -43,7 +45,7 @@ export class UserService {
       .getOne();
   }
 
-  async updateUserLevel(params: updateUserLevelDto): Promise<findUserLevelDto> {
+  async updateUserLevel(params: updateUserLevelDto): Promise<FindUserLevelDto> {
     let userLevel = new UserLevel();
 
     const { userId, answers } = params;
@@ -68,7 +70,7 @@ export class UserService {
      * EvaluateLevel에 필요한 형태로 foods와 answers 두 배열을 가공합니다.
      * foods와 answers 두 배열을 합칩니다. 동일한 foodId를 기준으로 두 배열의 각 요소는 합쳐지게 됩니다. foodId는 제외합니다.
      * @param foods foodId와 foodLeveLid로 이뤄진 배열
-     * @param answers foodId와 hotLevelId로 이뤄진 배열
+     * @param answers foodId와 HOT_LEVEL로 이뤄진 배열
      * @returns foods와 answers를 겹치는 foodId를 기준으로 요소를 합친 배열 { foodLevelId, hotLevelId }
      */
     const createEvaluateUserLevelParam = (
@@ -112,5 +114,30 @@ export class UserService {
       .where('user.id = :id', { id: userId })
       .getOne()
       .then(({ id: userId, userLevel }) => ({ userId, userLevel }));
+  }
+
+  async findUserCount(param: FindUserCountQueryDto): Promise<FindUserCountDto> {
+    // query param이라 string으로만 받아짐.
+    const levelTestedOnly = param.levelTestedOnly === 'true';
+
+    if (levelTestedOnly) {
+      return this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.userLevel', 'userLevel')
+        .where('userLevel.id IS NOT NULL')
+        .getCount()
+        .then((count) => ({
+          count,
+          levelTestedOnly,
+        }));
+    }
+
+    return this.userRepository
+      .createQueryBuilder('user')
+      .getCount()
+      .then((count) => ({
+        count,
+        levelTestedOnly,
+      }));
   }
 }

@@ -1,11 +1,13 @@
-import { IsString } from 'class-validator';
+import { IsString , isEnum, IsEnum} from 'class-validator';
+import { HOT_LEVEL } from 'src/food/enums/hot-level';
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
+
 
 export class CreateReviewDto 
 {
-    @IsString()
+    @IsEnum(HOT_LEVEL)
     @ApiProperty({ description: '음식 레벨 id' })
-    hotLevelId: string;
+    hotLevel: HOT_LEVEL;
     @IsString()
     @ApiProperty({ description: '사용자 id' })
     userId: string;

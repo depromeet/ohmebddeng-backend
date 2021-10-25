@@ -26,6 +26,13 @@ export class Food {
   @ApiProperty({ description: '음식 이름', type: String })
   name: string;
 
+  @Column()
+  @ApiProperty({
+    description: '음식 맛 ex) 순한맛, 매운맛, 1단계, 2단계',
+    type: String,
+  })
+  subName: string;
+
   @CreateDateColumn({ type: 'datetime' })
   @ApiProperty({ description: '음식 데이터가 만들어진 일자', type: Date })
   createdAt: Date;
@@ -37,6 +44,14 @@ export class Food {
   @DeleteDateColumn({ type: 'datetime' })
   @ApiProperty({ description: '음식 데이터가 삭제 된 일자', type: Date })
   deletedAt: Date;
+
+  @Column({ type: 'boolean', default: false })
+  @ApiProperty({
+    description: '사용자 레벨 테스트 확인용',
+    type: Boolean,
+    default: false,
+  })
+  isTest: boolean;
 
   @Column({ type: 'boolean', default: false })
   @ApiProperty({
