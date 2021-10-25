@@ -1,12 +1,14 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { FoodService } from './food.service';
 import { Food } from './entities/food.entity';
 import {
+  ApiBody,
   ApiCreatedResponse,
   ApiOperation,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { CreateFoodDto } from './dto/create-food.dto';
 
 @Controller('food')
 @ApiTags('음식 API')
@@ -35,5 +37,18 @@ export class FoodController {
   @ApiCreatedResponse({ description: '음식 list', type: Food })
   async testFoodList(@Query('size') size): Promise<Food[]> {
     return this.foodService.findTestFoods(size);
+  }
+
+  @Post()
+  @ApiOperation({
+    summary: '음식 정보를 저장하는 API',
+    description: '새로운 음식 정보를 저장합니다.',
+  })
+  @ApiBody({ type: CreateFoodDto })
+  @ApiCreatedResponse({ description: '등록 된 음식 정보', type: CreateFoodDto })
+  async createFoodInfo(
+    @Body() createFoodDto: CreateFoodDto,
+  ): Promise<CreateFoodDto> {
+    return this.foodService.createFoodInfo(createFoodDto);
   }
 }
