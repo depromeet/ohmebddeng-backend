@@ -9,7 +9,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateFoodDto } from './dto/create-food.dto';
-import { FindFoodsDto } from './dto/find-foods.dto';
+import { FindFoodsQueryDto } from './dto/find-foods-query.dto';
+import { FindFoodDto } from './dto/find-food.dto';
 
 @Controller('food')
 @ApiTags('음식 API')
@@ -23,8 +24,14 @@ export class FoodController {
     summary: '음식 리스트를 가져오는 API',
     description: '사용자 id, category가 주어질 경우 그에 맞는 음식만 가져온다.',
   })
-  async findFoodsByUserId(@Query() params: FindFoodsDto) {
-    return this.foodService.findFoodsByUserId(params);
+  @ApiQuery({
+    name: 'userId, category, hotLevel, sort, size',
+    description: 'userId, category, hotLevel, sort, size',
+    type: FindFoodsQueryDto,
+  })
+  @ApiCreatedResponse({ description: '음식 리스트', type: FindFoodDto })
+  async findFoods(@Query() params: FindFoodsQueryDto): Promise<FindFoodDto[]> {
+    return this.foodService.findFoods(params);
   }
 
   @Get('/reviews')
