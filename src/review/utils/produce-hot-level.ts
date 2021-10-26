@@ -1,4 +1,4 @@
-import { HOT_LEVEL } from 'src/food/enums/hot-level';
+import { HOT_LEVEL } from 'src/common/enums/hot-level';
 
 /**
  * hotLevelId를 enum HOT_LEVEL로 변환합니다.

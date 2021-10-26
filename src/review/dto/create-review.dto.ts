@@ -1,5 +1,5 @@
 import { IsString, IsEnum } from 'class-validator';
-import { HOT_LEVEL } from 'src/food/enums/hot-level';
+import { HOT_LEVEL } from 'src/common/enums/hot-level';
 
 export class CreateReviewDto {
   @IsEnum(HOT_LEVEL)
