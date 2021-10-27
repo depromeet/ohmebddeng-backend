@@ -37,3 +37,6 @@ lerna-debug.log*
 
 # config file
 ormconfig.json
+
+# Docker Compose File
+docker-compose.yml

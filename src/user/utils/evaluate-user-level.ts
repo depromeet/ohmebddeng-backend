@@ -1,4 +1,4 @@
-import { HOT_LEVEL } from 'src/food/enums/hot-level';
+import { HOT_LEVEL } from 'src/common/enums/hot-level';
 
 interface ILevelTest {
   foodLevelId: string;

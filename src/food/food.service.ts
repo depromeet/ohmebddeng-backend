@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getConnection, Repository } from 'typeorm';
+import { produceHotLevelId } from 'src/review/utils/produce-hot-level';
+import { Repository } from 'typeorm';
 import { CreateFoodDto } from './dto/create-food.dto';
+import { FindFoodDto } from './dto/find-food.dto';
+import { FindFoodsQueryDto } from './dto/find-foods-query.dto';
 import { Category } from './entities/category.entity';
 import { Food } from './entities/food.entity';
 import { FoodLevel } from './entities/food_level.entity';
+import { produceFindFoodDto } from './utils/produceFindFoodDto';
+import { sortBy } from './utils/sortBy';
 
 @Injectable()
 export class FoodService {
@@ -82,5 +87,61 @@ export class FoodService {
       level,
       category,
     };
+  }
+
+  /**
+   * 음식 리스트를 가져옵니다. userId가 주어지면 user의 맵레벨에 맞는 음식들만 필터해 가져옵니다.
+   * category가 주어지면 category에 해당하는 음식들만 필터해 가져옵니다.
+   * userId와 category는 Optional하게 주거나 안 줄 수 있습니다.
+   * 경우에 따라서 user의 맵레벨과 상관없이 특정 카테고리의 모든 음식만 가져오는 API가 필요할 수도 있고,
+   * 전체 음식 리스트를 가져오고 싶은 경우도 있을 수 있기 때문입니다.
+   * @param param userId?: string, category?: string, size?: string, sort?: SORT, hotLevel?: HOT_LEVEL
+   * @returns id, name, subName, imageUrl, hotLevel로 이루어진 객체의 배열
+   */
+  async findFoods(param: FindFoodsQueryDto): Promise<FindFoodDto[]> {
+    const { category, hotLevel, size: providedSize, sort } = param;
+    const size = providedSize ? Number(providedSize) : 10; // default size = 10
+
+    // hotLevel 없이 요청이 온 경우
+    if (!hotLevel) {
+      // hotLevel 없고, category도 없는 경우
+      if (!category) {
+        const query = this.foodRepository.createQueryBuilder('food');
+
+        return sortBy(query, sort)
+          .take(size)
+          .getMany()
+          .then(produceFindFoodDto);
+      }
+
+      // hotLevel만 없는 경우
+      const query = this.foodRepository
+        .createQueryBuilder('food')
+        .leftJoinAndSelect('food.categories', 'category')
+        .where('category.name = :categoryName', { categoryName: category });
+
+      return sortBy(query, sort).take(size).getMany().then(produceFindFoodDto);
+    }
+
+    // hotLevel이 있는 경우
+    const hotLevelId = produceHotLevelId(hotLevel);
+
+    // hotLevel은 있지만 category가 없는 경우
+    if (!category) {
+      const query = this.foodRepository
+        .createQueryBuilder('food')
+        .leftJoinAndSelect('food.foodLevel', 'foodLevel')
+        .where('foodLevel.id = :hotLevelId', { hotLevelId });
+
+      return sortBy(query, sort).take(size).getMany().then(produceFindFoodDto);
+    }
+    const query = this.foodRepository
+      .createQueryBuilder('food')
+      .leftJoinAndSelect('food.categories', 'category')
+      .leftJoinAndSelect('food.foodLevel', 'foodLevel')
+      .where('category.name = :categoryName', { categoryName: category })
+      .andWhere('foodLevel.id = :hotLevelId', { hotLevelId });
+
+    return sortBy(query, sort).take(size).getMany().then(produceFindFoodDto);
   }
 }

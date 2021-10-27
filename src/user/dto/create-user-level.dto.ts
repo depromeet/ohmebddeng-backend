@@ -1,6 +1,6 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsString } from 'class-validator';
-import { HOT_LEVEL } from 'src/food/enums/hot-level';
+import { HOT_LEVEL } from 'src/common/enums/hot-level';
 import { UserLevel } from '../entities/user_level.entity';
 // import { IReview } from 'src/review/dto/create-reviews.dto';
 

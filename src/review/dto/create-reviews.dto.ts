@@ -1,6 +1,6 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { IsString, IsArray, IsEnum } from 'class-validator';
-import { HOT_LEVEL } from 'src/food/enums/hot-level';
+import { HOT_LEVEL } from 'src/common/enums/hot-level';
 
 export class Review {
   @IsEnum(HOT_LEVEL)
