@@ -149,4 +149,24 @@ export class FoodService {
 
     return sortBy(query, sort).take(size).getMany().then(produceFindFoodDto);
   }
+
+  // 레벨 별 음식 정보를 가져 옵니다.
+  async findUserLevelFoods(param): Promise<Food[]> {
+    const { userLevel } = param;
+
+    const { id: foodLevel } = await this.foodLevelRepository
+      .createQueryBuilder('foodLevel')
+      .leftJoinAndSelect('foodLevel.userLevel', 'userLevel')
+      .where('foodLevel.userLevel = :userLevel', { userLevel })
+      .getOne();
+
+    return await this.foodRepository
+      .createQueryBuilder('food')
+      .leftJoinAndSelect('food.foodLevel', 'foodLevel')
+      .select(['food.name', 'food.subName', 'food.imageUrl'])
+      .where('food.foodLevel = :foodLevel', { foodLevel })
+      .orderBy('RAND()')
+      .limit(3)
+      .getMany();
+  }
 }
