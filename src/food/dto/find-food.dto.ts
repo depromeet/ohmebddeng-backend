@@ -12,7 +12,7 @@ export class FindFoodDto {
   name: string;
 
   @IsString()
-  @ApiProperty({ description: '음식 부제목' })
+  @ApiProperty({ description: '음식 맛' })
   subName: string;
 
   @IsString()
