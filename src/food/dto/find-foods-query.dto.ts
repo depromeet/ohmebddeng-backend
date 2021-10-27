@@ -33,7 +33,7 @@ export class FindFoodsQueryDto {
   @IsEnum(SORT)
   @IsOptional()
   @ApiProperty({
-    description: '가져오려는 음식의 개수',
+    description: '가져오려는 음식의 정렬 방식',
     required: false,
     enum: SORT,
   })
