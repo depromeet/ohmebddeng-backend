@@ -6,7 +6,7 @@ import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 export class CreateReviewDto 
 {
     @IsEnum(HOT_LEVEL)
-    @ApiProperty({ description: '음식 레벨 id' })
+    @ApiProperty({ description: "음식 레벨 ex) 'EASY', 'NORMAL', 'HOT', 'HOTTEST', 'NEVER_TRIED'" })
     hotLevel: HOT_LEVEL;
     @IsString()
     @ApiProperty({ description: '사용자 id' })

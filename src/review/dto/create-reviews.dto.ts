@@ -4,7 +4,7 @@ import { HOT_LEVEL } from 'src/food/enums/hot-level';
 
 export class Review {
   @IsEnum(HOT_LEVEL)
-  @ApiProperty({ description: '음식 레벨 id'})
+  @ApiProperty({ description: "음식 레벨 ex) 'EASY', 'NORMAL', 'HOT', 'HOTTEST', 'NEVER_TRIED'"})
   hotLevel: HOT_LEVEL;
   @IsString()
   @ApiProperty({ description: '음식 id'})
@@ -20,6 +20,6 @@ export class CreateReviewsDto {
   userId: string;
 
   @IsArray()
-  @ApiProperty({ description: '리뮤 클래스의 배열'})
+  @ApiProperty({ description: '리뷰 클래스의 배열'})
   reviewList: Review[];
 }
