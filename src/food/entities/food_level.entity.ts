@@ -1,6 +1,14 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Food } from './food.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserLevel } from 'src/user/entities/user_level.entity';
 
 @Entity()
 export class FoodLevel {
@@ -25,6 +33,12 @@ export class FoodLevel {
   description: string;
 
   // food
-  @OneToMany((type) => Food, (food) => food.foodLevel)
+  @OneToMany(() => Food, (food) => food.foodLevel)
   foods: Food[];
+
+  //userLevel
+  @OneToOne(() => UserLevel)
+  @JoinColumn()
+  @ApiProperty({ description: '사용자 레벨' })
+  userLevel: UserLevel;
 }
