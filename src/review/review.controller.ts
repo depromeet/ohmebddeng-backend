@@ -12,6 +12,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
+  ApiQuery,
 } from '@nestjs/swagger';
 
 @Controller('review')
@@ -53,6 +54,10 @@ export class ReviewController {
     description: '음식 ID를 기반으로 리뷰를 찾아 반환한다',
   })
   @ApiParam({ name: '음식ID', type: String })
+  @ApiQuery({
+    name: 'userLevelId',
+    description: 'userLevelId값을 받는다.'
+  })
   @ApiResponse({ description: '해당하는 리뷰에 대한 정보를 받는다.', type: [FindReviewDto]})
   findOnebyfood(@Param() params) : Promise<FindReviewDto[]> {
     return this.reviewService.findReviewByfoodId(params.foodId);

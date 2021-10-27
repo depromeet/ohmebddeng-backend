@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { CreateReviewsDto } from './dto/create-reviews.dto';
+import { FindReviewsQueryDto } from './dto/find-review-query.dto';
 import { Review } from './entities/review.entity';
 import { FoodLevel } from '../food/entities/food_level.entity';
 import { User } from '../user/entities/user.entity';
@@ -68,6 +69,7 @@ export class ReviewService {
     };
   }
 
+  /*
   async findReviewByfoodId(foodId: number) {
     return this.reviewRepository
       .createQueryBuilder('review')
@@ -92,7 +94,36 @@ export class ReviewService {
           return { ...review, hotLevel };
         }),
       );
+  }*/
+
+  async findReviewByfoodId(userLevel: string, foodId: number) {
+    return this.reviewRepository
+      .createQueryBuilder('review')
+      .leftJoin('review.food', 'food')
+      .leftJoin('review.user', 'user')
+      .leftJoin('review.hotLevel', 'hotLevel')
+      .leftJoin('review.tasteReviews', 'review_taste_tag')
+      .select([
+        'review',
+        'food.id',
+        'food.name',
+        'user.id',
+        'hotLevel',
+        'review_taste_tag.id',
+        'review_taste_tag.name',
+      ])
+      .where('review.foodId = :foodId', { foodId })
+      .getMany()
+
+      .then((reviews) =>
+        reviews.map((review) => {
+          const hotLevel = produceHotLevelString(review.hotLevel.id);
+          return { ...review, hotLevel };
+        }),
+      );
   }
+
+  
 
   async findReviewByUserId(userId: number) {
     return this.reviewRepository
@@ -119,4 +150,6 @@ export class ReviewService {
         }),
       );
   }
+
+
 }
