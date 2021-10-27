@@ -6,6 +6,7 @@ import {
   ApiCreatedResponse,
   ApiOperation,
   ApiQuery,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateFoodDto } from './dto/create-food.dto';
@@ -29,7 +30,7 @@ export class FoodController {
     description: 'userId, category, hotLevel, sort, size',
     type: FindFoodsQueryDto,
   })
-  @ApiCreatedResponse({ description: '음식 리스트', type: FindFoodDto })
+  @ApiResponse({ description: '음식 리스트', type: FindFoodDto })
   async findFoods(@Query() params: FindFoodsQueryDto): Promise<FindFoodDto[]> {
     return this.foodService.findFoods(params);
   }
