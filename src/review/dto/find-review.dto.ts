@@ -1,11 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { IsArray,  IsEnum, IsString, IsDate, IsBoolean } from 'class-validator';
 import { HOT_LEVEL } from 'src/food/enums/hot-level';
-import { Review } from '../entities/review.entity';
 import { TasteTag } from '../entities/taste_tag.entity';
 import { Food } from 'src/food/entities/food.entity';
 import { User } from 'src/user/entities/user.entity';
+import { Review } from '../entities/review.entity';
 
+@ApiExtraModels(TasteTag, Review)
 export class FindReviewDto {
   
   @IsEnum(HOT_LEVEL)

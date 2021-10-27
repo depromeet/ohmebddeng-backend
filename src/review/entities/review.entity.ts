@@ -43,7 +43,7 @@ export class Review {
   // 하나의 리뷰에 맛에 대한 여러 맛평가 태그가 포함될 수 있어, ManyToMany로 설정함.
   @ManyToMany(() => TasteTag, {nullable: false})
   @JoinTable({ name: 'review_taste_tag'})
-  @ApiProperty({ description: '리뷰에서 음식의 맛 평가 태그'})
+  @ApiProperty({ description: '리뷰에서 음식의 맛 평가 태그', type: () => [TasteTag]})
   tasteReviews: TasteTag[];
 
   // Food
@@ -53,6 +53,6 @@ export class Review {
 
   // User
   @ManyToOne(() => User, (user) => user.reviews, { primary: true })
-  @ApiProperty({ description: '리뷰를 한 유저'})
+  @ApiProperty({ description: '리뷰를 한 유저', type: () => User })
   user: User;
 }

@@ -1,6 +1,6 @@
 import { IsString , isEnum, IsEnum} from 'class-validator';
 import { HOT_LEVEL } from 'src/food/enums/hot-level';
-import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 
 export class CreateReviewDto 
