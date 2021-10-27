@@ -40,10 +40,9 @@ export class FoodController {
     summary: '리뷰할 음식 리스트를 가져오는 API',
     description: '리뷰 할 음식 List을 가져온다.',
   })
-  @ApiQuery({ name: 'size' })
   @ApiCreatedResponse({ description: '음식 list', type: Food })
-  async reviewFoodList(@Query('size') size): Promise<Food[]> {
-    return this.foodService.findReviewFoods(size);
+  async reviewFoodList(): Promise<Food[]> {
+    return this.foodService.findReviewFoods();
   }
 
   @Get('/tests')

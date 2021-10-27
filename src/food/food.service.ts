@@ -28,9 +28,14 @@ export class FoodService {
     this.categoryRepository = categoryRepository;
   }
 
-  async findReviewFoods(size): Promise<Food[]> {
-    const foodList = await this.foodRepository.find(size);
-    return foodList;
+  async findReviewFoods(): Promise<Food[]> {
+    return await this.foodRepository
+      .createQueryBuilder('food')
+      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+      .where('food.isTest = true')
+      .orderBy('RAND()')
+      .limit(3)
+      .getMany();
   }
 
   async findTestFoods(): Promise<Food[]> {
