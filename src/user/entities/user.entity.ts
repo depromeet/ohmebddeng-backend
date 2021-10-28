@@ -81,7 +81,7 @@ export class User {
   role: string;
 
   @ManyToOne(() => UserLevel)
-  @ApiProperty({ description: '사용자의 맵레벨' })
+  @ApiProperty({ description: '사용자의 맵레벨', type: () => UserLevel })
   userLevel!: UserLevel;
 
   // review
