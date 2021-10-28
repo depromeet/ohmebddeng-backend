@@ -12,10 +12,14 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
+  PartialType,
+  PickType,
 } from '@nestjs/swagger';
 import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
 import { IsBooleanString } from 'class-validator';
 import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
+import { FindUserDto } from './dto/find-user.dto';
+import { UserLevel } from './entities/user_level.entity';
 @Controller('user')
 @ApiTags('사용자 API')
 export class UserController {
@@ -64,11 +68,13 @@ export class UserController {
     description: '사용자 ID를 기반으로 사용자를 찾아 반환한다',
   })
   @ApiParam({ name: '사용자ID', type: String })
-  @ApiResponse({ description: '사용자에 대한 정보를 받는다', type: User })
-  async findUser(@Param() params): Promise<User> {
+  @ApiResponse({
+    description: '사용자에 대한 정보를 받는다',
+    type: FindUserDto,
+  })
+  async findUser(@Param() params): Promise<FindUserDto> {
     return this.userService.findUser(params.userId);
   }
-
   // 사용자 레벨 테스트 제출
   @Post('level')
   @ApiOperation({
