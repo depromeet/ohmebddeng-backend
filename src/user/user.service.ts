@@ -57,9 +57,7 @@ export class UserService {
       });
   }
 
-  async updateUserLevel(
-    params: updateUserLevelDto,
-  ): Promise<FindUserLevelDto | any> {
+  async updateUserLevel(params: updateUserLevelDto): Promise<FindUserLevelDto> {
     let userLevel = new UserLevel();
 
     const { userId, answers } = params;
