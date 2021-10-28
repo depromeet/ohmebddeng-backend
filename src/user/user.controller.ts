@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from './entities/user.entity';
 import { FindUserCountDto } from './dto/find-user-count.dto';
 
 import { updateUserLevelDto } from './dto/create-user-level.dto';
@@ -12,14 +11,10 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
-  PartialType,
-  PickType,
 } from '@nestjs/swagger';
 import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
-import { IsBooleanString } from 'class-validator';
 import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
 import { FindUserDto } from './dto/find-user.dto';
-import { UserLevel } from './entities/user_level.entity';
 @Controller('user')
 @ApiTags('사용자 API')
 export class UserController {
