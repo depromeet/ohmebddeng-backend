@@ -37,7 +37,11 @@ export class UserService {
     const { anonymousId, id: userId } = await this.userRepository.save(user);
     return { anonymousId, userId };
   }
-
+  /**
+   * 사용자 id를 기반으로 해당 사용자의 정보를 가져오는 API
+   * @param userId 사용자 id를 param으로 받음
+   * @returns 사용자 정보, 사용자 레벨 정보, 사용자의 리뷰 정보
+   */
   async findUser(userId: string): Promise<FindUserDto> {
     return this.userRepository
       .createQueryBuilder('user')
@@ -46,12 +50,16 @@ export class UserService {
       .where('user.id = :userId', { userId })
       .getOne()
       .then((user) => {
+        // Return 타입 변경
+        // isDeleted, role을 빼고 보냄
+        const { userLevel, isDeleted, role, ...userRest } = user;
+
         const { id, name, imageUrl, summary, description, userLevelDetail } =
-          user.userLevel;
+          userLevel;
         const details = userLevelDetail.map(({ detail }) => detail);
 
         return {
-          ...user,
+          ...userRest,
           userLevel: { id, name, imageUrl, summary, description, details },
         };
       });
