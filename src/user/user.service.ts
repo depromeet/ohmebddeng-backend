@@ -19,6 +19,8 @@ interface IFoodLevel {
 import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
 import { FindUserCountDto } from './dto/find-user-count.dto';
 import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
+import { UserLevelDetail } from './entities/user_level_detail.entity';
+import { FindUserDto } from './dto/find-user.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -37,15 +39,30 @@ export class UserService {
     return { anonymousId, userId };
   }
 
-  findUser(userId: string): Promise<User> {
+  async findUser(userId: string): Promise<FindUserDto> {
+    console.log(userId);
     return this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userLevel', 'userLevel')
+      .leftJoinAndSelect('userLevel.userLevelDetail', 'userLevelDetail')
       .where('user.id = :userId', { userId })
-      .getOne();
+      .getOne()
+      .then((user) => {
+        const { id, name, imageUrl, summary, description, userLevelDetail } =
+          user.userLevel;
+        const detail = userLevelDetail.map(
+          ({ characteristic }) => characteristic,
+        );
+        return {
+          ...user,
+          userLevel: { id, name, imageUrl, summary, description, detail },
+        };
+      });
   }
 
-  async updateUserLevel(params: updateUserLevelDto): Promise<FindUserLevelDto> {
+  async updateUserLevel(
+    params: updateUserLevelDto,
+  ): Promise<FindUserLevelDto | any> {
     let userLevel = new UserLevel();
 
     const { userId, answers } = params;
@@ -106,7 +123,7 @@ export class UserService {
       .where('id = :id', { id: userId })
       .execute();
 
-    // // return userLevel
+    // return userLevel
     return this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.userLevel', 'userLevel')
