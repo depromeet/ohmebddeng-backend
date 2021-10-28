@@ -23,6 +23,8 @@ class UserLevelDto {
 }
 
 export class FindUserDto implements Omit<User, 'userLevel'> {
+  isDeleted: boolean;
+  role: string;
   @ApiProperty({ description: 'id' })
   id: string;
 
@@ -64,12 +66,6 @@ export class FindUserDto implements Omit<User, 'userLevel'> {
 
   @ApiProperty({ description: 'deletedAt' })
   deletedAt: Date;
-
-  @ApiProperty({ description: 'isDeleted' })
-  isDeleted: boolean;
-
-  @ApiProperty({ description: 'role' })
-  role: string;
 
   @ApiProperty({ description: 'userLevel', type: UserLevelDto })
   userLevel: UserLevelDto;
