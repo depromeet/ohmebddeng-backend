@@ -19,7 +19,7 @@ class UserLevelDto {
   description: string;
 
   @ApiProperty({ description: 'detail' })
-  detail: string[];
+  details: string[];
 }
 
 export class FindUserDto implements Omit<User, 'userLevel'> {

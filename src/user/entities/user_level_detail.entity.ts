@@ -16,5 +16,5 @@ export class UserLevelDetail {
 
   @Column()
   @ApiProperty({ description: '사용자의 맵레벨에 맞는 특성' })
-  characteristic: string;
+  detail: string;
 }

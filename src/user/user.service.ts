@@ -48,12 +48,11 @@ export class UserService {
       .then((user) => {
         const { id, name, imageUrl, summary, description, userLevelDetail } =
           user.userLevel;
-        const detail = userLevelDetail.map(
-          ({ characteristic }) => characteristic,
-        );
+        const details = userLevelDetail.map(({ detail }) => detail);
+
         return {
           ...user,
-          userLevel: { id, name, imageUrl, summary, description, detail },
+          userLevel: { id, name, imageUrl, summary, description, details },
         };
       });
   }
