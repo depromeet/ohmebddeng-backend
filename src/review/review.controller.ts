@@ -62,16 +62,12 @@ export class ReviewController {
     summary: '음식 Id 기반 리뷰 조회 API',
     description: '음식 ID를 기반으로 리뷰를 찾아 반환한다',
   })
-  @ApiParam({ name: '음식ID', type: String })
-  @ApiQuery({
-    name: 'userLevelId',
-    description: 'userLevelId값을 받는다.',
-  })
+  @ApiParam({ name: '음식 id', type: String })
   @ApiResponse({
     description: '해당하는 리뷰에 대한 정보를 받는다.',
     type: FindReviewDto,
   })
-  findOnebyfood(@Param() params): Promise<FindReviewDto[]> {
+  findReviewByfoodId(@Param() params): Promise<FindReviewDto[]> {
     return this.reviewService.findReviewByfoodId(params.foodId);
   }
 
@@ -92,6 +88,16 @@ export class ReviewController {
   }
 
   @Get('food/count/:foodId')
+  @ApiParam({ name: '가져오려는 음식의 id', type: String })
+  @ApiQuery({
+    name: '데이터를 가져오려는 사용자 레벨',
+    type: '1' || '2' || '3' || '4' || '5',
+  })
+  @ApiResponse({
+    description:
+      '해당 음식에 대한 사용자들의 매운 정도 평가, 맛 평가 태그 count 값',
+    type: FindReviewCountDto,
+  })
   findReviewCountByFood(
     @Param() param: { foodId: string },
     @Query() query: { level: '1' | '2' | '3' | '4' | '5' },
