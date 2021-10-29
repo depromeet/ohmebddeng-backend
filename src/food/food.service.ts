@@ -167,7 +167,7 @@ export class FoodService {
     return await this.foodRepository
       .createQueryBuilder('food')
       .leftJoinAndSelect('food.foodLevel', 'foodLevel')
-      .select(['food.name', 'food.subName', 'food.imageUrl'])
+      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
       .where('food.foodLevel = :foodLevel', { foodLevel })
       .orderBy('RAND()')
       .limit(3)
