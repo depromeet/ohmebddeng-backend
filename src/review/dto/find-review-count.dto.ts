@@ -3,13 +3,17 @@ import { IsObject } from 'class-validator';
 import { HOT_LEVEL } from 'src/common/enums/hot-level';
 import { TASTE_TAG } from 'src/common/enums/taste-tag';
 
+type CountTotal = {
+  total: number;
+};
+
 export type HotLevelCountType = {
   [key in HOT_LEVEL]: number;
-};
+} & CountTotal;
 
 export type TasteTagCountType = {
   [key in TASTE_TAG]: number;
-};
+} & CountTotal;
 
 export class FindReviewCountDto {
   @IsObject()
