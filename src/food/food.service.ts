@@ -173,4 +173,13 @@ export class FoodService {
       .limit(3)
       .getMany();
   }
+
+  async findRandomFoods(): Promise<Food[]> {
+    return await this.foodRepository
+      .createQueryBuilder('food')
+      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+      .orderBy('RAND()')
+      .limit(1)
+      .getMany();
+  }
 }
