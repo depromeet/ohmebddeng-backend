@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsNumberString } from 'class-validator';
 
 export class FindUserLevelFoodDto {
-  @IsString()
+  @IsNumberString()
   @ApiProperty({ description: '사용자 레벨' })
   userLevel: string;
 }

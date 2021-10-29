@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { produceHotLevelId } from 'src/review/utils/produce-hot-level';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { CreateFoodDto } from './dto/create-food.dto';
 import { FindFoodDto } from './dto/find-food.dto';
 import { FindFoodsQueryDto } from './dto/find-foods-query.dto';
@@ -154,7 +154,7 @@ export class FoodService {
   async findUserLevelFoods(param): Promise<Food[]> {
     const { userLevel } = param;
 
-    if (userLevel === '5') {
+    if (Number(userLevel) < 1 || Number(userLevel) > 4) {
       return [];
     }
 
