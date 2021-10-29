@@ -13,7 +13,13 @@ import {
   produceHotLevelId,
   produceHotLevelString,
 } from './utils/produce-hot-level';
-import { FindReviewCountDto } from './dto/find-review-count.dto';
+import {
+  FindReviewCountDto,
+  TasteTagCountType,
+} from './dto/find-review-count.dto';
+import { produceTasteTagString } from './utils/produceTasteTag';
+import { HOT_LEVEL } from 'src/common/enums/hot-level';
+import { TASTE_TAG } from 'src/common/enums/taste-tag';
 
 @Injectable()
 export class ReviewService {
@@ -150,10 +156,9 @@ export class ReviewService {
   }
 
   async findReviewCountByFood(
-    level: string,
     foodId: string,
+    level: '1' | '2' | '3' | '4' | '5',
   ): Promise<FindReviewCountDto> {
-    // 주어진 레벨의 유저에 대해, 음식의 맵기 정도 평가 (hotLevelId) count하기
     /**
 SELECT 
 review.hotLevelId,
@@ -179,6 +184,63 @@ FROM
     where user.userLevelId = 5 and rtt.reviewUserId = 1
 GROUP BY rtt.tasteTagId;
  */
-    return {} as FindReviewCountDto;
+    // 주어진 레벨의 유저에 대해, 음식의 맵기 정도 평가 (hotLevelId) count하기
+    const hotLevelCount = await this.reviewRepository
+      .createQueryBuilder('review')
+      .select('review.hotLevelId')
+      .addSelect('COUNT(*) AS count')
+      .leftJoin('review.tasteReviews', 'tasteTag')
+      .leftJoin('review.user', 'user')
+      .where('review.foodId = :foodId', { foodId })
+      .andWhere('user.userLevelId = :level', { level })
+      .groupBy('review.hotLevelId')
+      .getRawMany()
+      .then((textRows) => {
+        const hotLevelCount = {
+          [HOT_LEVEL.EASY]: 0,
+          [HOT_LEVEL.HOT]: 0,
+          [HOT_LEVEL.HOTTEST]: 0,
+          [HOT_LEVEL.NORMAL]: 0,
+        };
+
+        textRows.forEach((row) => {
+          const { hotLevelId, count } = row;
+          const tasteTag = produceHotLevelString(hotLevelId);
+          hotLevelCount[tasteTag] = Number(count);
+        });
+
+        return hotLevelCount;
+      });
+
+    const tasteTagCount = await this.reviewRepository
+      .createQueryBuilder('review')
+      .select('tasteTag.id')
+      .addSelect('COUNT(*) AS count')
+      .leftJoin('review.tasteReviews', 'tasteTag')
+      .leftJoin('review.user', 'user')
+      .where('review.foodId = :foodId', { foodId })
+      .andWhere('user.userLevelId = :level', { level })
+      .groupBy('tasteTag.id')
+      .getRawMany()
+      .then((textRows) => {
+        const tasteTagCount = {
+          [TASTE_TAG.ALSSA]: 0,
+          [TASTE_TAG.EOLEOL]: 0,
+          [TASTE_TAG.EOLKEUN]: 0,
+          [TASTE_TAG.GAEUN]: 0,
+          [TASTE_TAG.KALKAL]: 0,
+          [TASTE_TAG.MAECOMDALCOM]: 0,
+        };
+
+        textRows.forEach((row) => {
+          const { tasteTag_id: tasteTagId, count } = row;
+          const tasteTag = produceTasteTagString(tasteTagId);
+          tasteTagCount[tasteTag] = Number(count);
+        });
+
+        return tasteTagCount;
+      });
+
+    return { hotLevelCount, tasteTagCount };
   }
 }
