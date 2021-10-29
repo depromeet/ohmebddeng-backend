@@ -85,4 +85,14 @@ export class FoodController {
   ): Promise<Food[]> {
     return this.foodService.findUserLevelFoods(param);
   }
+
+  @Get('/random')
+  @ApiOperation({
+    summary: '음식 랜덤 추천 API',
+    description: '음식을 랜덤 추천합니다.',
+  })
+  @ApiCreatedResponse({ description: '레벨별 음식 정보', type: Food })
+  async findRandomFood(): Promise<Food[]> {
+    return this.foodService.findRandomFoods();
+  }
 }
