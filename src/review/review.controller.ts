@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { Review } from './entities/review.entity';
 import { ReviewService } from './review.service';
@@ -102,9 +103,9 @@ export class ReviewController {
 
   @Get('food/count/:foodId')
   findReviewCountByFood(
-    level: string,
-    foodId: string,
+    @Param() param: { foodId: string },
+    @Query() query: { level: '1' | '2' | '3' | '4' | '5' },
   ): Promise<FindReviewCountDto> {
-    return this.reviewService.findReviewCountByFood(level, foodId);
+    return this.reviewService.findReviewCountByFood(param.foodId, query.level);
   }
 }
