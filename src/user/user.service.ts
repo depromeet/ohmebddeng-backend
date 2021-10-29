@@ -42,7 +42,16 @@ export class UserService {
    * @param userId 사용자 id를 param으로 받음
    * @returns 사용자 정보, 사용자 레벨 정보, 사용자의 리뷰 정보
    */
-  async findUser(userId: string): Promise<FindUserDto> {
+  async findUser(
+    userId: string,
+  ): Promise<FindUserDto | Omit<FindUserDto, 'userLevel'>> {
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userLevel', 'userLevel')
+      .leftJoinAndSelect('userLevel.userLevelDetail', 'userLevelDetail')
+      .where('user.id = :userId', { userId })
+      .getOne();
+
     return this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userLevel', 'userLevel')
@@ -53,6 +62,11 @@ export class UserService {
         // Return 타입 변경
         // isDeleted, role을 빼고 보냄
         const { userLevel, isDeleted, role, ...userRest } = user;
+
+        // 사용자가 레벨테스트를 진행하지 않아 레벨이 없을 경우, userRest return합니다
+        if (!userLevel) {
+          return userRest;
+        }
 
         const {
           id,

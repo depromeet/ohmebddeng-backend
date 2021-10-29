@@ -67,7 +67,9 @@ export class UserController {
     description: '사용자에 대한 정보를 받는다',
     type: FindUserDto,
   })
-  async findUser(@Param() params): Promise<FindUserDto> {
+  async findUser(
+    @Param() params,
+  ): Promise<FindUserDto | Omit<FindUserDto, 'userLevel'>> {
     return this.userService.findUser(params.userId);
   }
   // 사용자 레벨 테스트 제출
