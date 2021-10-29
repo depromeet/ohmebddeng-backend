@@ -54,13 +54,28 @@ export class UserService {
         // isDeleted, role을 빼고 보냄
         const { userLevel, isDeleted, role, ...userRest } = user;
 
-        const { id, name, imageUrl, summary, description, userLevelDetail } =
-          userLevel;
+        const {
+          id,
+          name,
+          imageUrl,
+          summary,
+          description,
+          userLevelDetail,
+          level,
+        } = userLevel;
         const details = userLevelDetail.map(({ detail }) => detail);
 
         return {
           ...userRest,
-          userLevel: { id, name, imageUrl, summary, description, details },
+          userLevel: {
+            id,
+            name,
+            imageUrl,
+            summary,
+            description,
+            details,
+            level,
+          },
         };
       });
   }
