@@ -23,3 +23,21 @@ export class FindFoodDto {
   @ApiProperty({ description: '음식의 맵기 레벨', enum: HOT_LEVEL })
   hotLevel: HOT_LEVEL;
 }
+
+export class RandomFoodDto {
+  @IsNumberString()
+  @ApiProperty({ description: '음식 id' })
+  id: string;
+
+  @IsString()
+  @ApiProperty({ description: '음식명' })
+  name: string;
+
+  @IsString()
+  @ApiProperty({ description: '음식 맛' })
+  subName: string;
+
+  @IsString()
+  @ApiProperty({ description: '음식 이미지', type: String || null })
+  imageUrl: string | null;
+}

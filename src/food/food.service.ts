@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { produceHotLevelId } from 'src/review/utils/produce-hot-level';
 import { Not, Repository } from 'typeorm';
 import { CreateFoodDto } from './dto/create-food.dto';
-import { FindFoodDto } from './dto/find-food.dto';
+import { FindFoodDto, RandomFoodDto } from './dto/find-food.dto';
 import { FindFoodsQueryDto } from './dto/find-foods-query.dto';
 import { Category } from './entities/category.entity';
 import { Food } from './entities/food.entity';
@@ -174,12 +174,12 @@ export class FoodService {
       .getMany();
   }
 
-  async findRandomFoods(): Promise<Food[]> {
+  async findRandomFoods(): Promise<RandomFoodDto> {
     return await this.foodRepository
       .createQueryBuilder('food')
       .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
       .orderBy('RAND()')
       .limit(1)
-      .getMany();
+      .getOne();
   }
 }

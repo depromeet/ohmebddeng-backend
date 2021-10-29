@@ -11,7 +11,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateFoodDto } from './dto/create-food.dto';
 import { FindFoodsQueryDto } from './dto/find-foods-query.dto';
-import { FindFoodDto } from './dto/find-food.dto';
+import { FindFoodDto, RandomFoodDto } from './dto/find-food.dto';
 import { FindUserLevelFoodDto } from './dto/find-userLevel-food.dto';
 
 @Controller('food')
@@ -91,8 +91,8 @@ export class FoodController {
     summary: '음식 랜덤 추천 API',
     description: '음식을 랜덤 추천합니다.',
   })
-  @ApiCreatedResponse({ description: '레벨별 음식 정보', type: Food })
-  async findRandomFood(): Promise<Food[]> {
+  @ApiCreatedResponse({ description: '레벨별 음식 정보', type: RandomFoodDto })
+  async findRandomFood(): Promise<RandomFoodDto> {
     return this.foodService.findRandomFoods();
   }
 }
