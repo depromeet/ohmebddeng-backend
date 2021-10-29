@@ -88,6 +88,11 @@ export class ReviewController {
   }
 
   @Get('food/count/:foodId')
+  @ApiOperation({
+    summary: '특정 음식에 대해 사용자 레벨 별로 리뷰 통계를 가져오는 API',
+    description:
+      '특정 음식에 대해 조회하려는 사용자레벨 별로 매운 정도 통계, 태그 통계를 가져온다',
+  })
   @ApiParam({ name: '가져오려는 음식의 id', type: String })
   @ApiQuery({
     name: '데이터를 가져오려는 사용자 레벨',
