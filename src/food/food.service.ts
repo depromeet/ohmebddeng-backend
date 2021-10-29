@@ -154,6 +154,10 @@ export class FoodService {
   async findUserLevelFoods(param): Promise<Food[]> {
     const { userLevel } = param;
 
+    if (userLevel === '5') {
+      return [];
+    }
+
     const { id: foodLevel } = await this.foodLevelRepository
       .createQueryBuilder('foodLevel')
       .leftJoinAndSelect('foodLevel.userLevel', 'userLevel')
