@@ -12,6 +12,14 @@ import {
   produceHotLevelId,
   produceHotLevelString,
 } from './utils/produce-hot-level';
+import {
+  FindReviewCountDto,
+  HotLevelCountType,
+  TasteTagCountType,
+} from './dto/find-review-count.dto';
+import { produceTasteTagString } from './utils/produceTasteTag';
+import { HOT_LEVEL } from 'src/common/enums/hot-level';
+import { TASTE_TAG } from 'src/common/enums/taste-tag';
 
 @Injectable()
 export class ReviewService {
@@ -94,7 +102,7 @@ export class ReviewService {
       );
   }
 
-  async findReviewByUserId(userId: number) {
+  async findReviewsByUser(userId: number) {
     return this.reviewRepository
       .createQueryBuilder('review')
       .leftJoinAndSelect('review.food', 'food')
@@ -118,5 +126,71 @@ export class ReviewService {
           return { ...review, hotLevel };
         }),
       );
+  }
+
+  async findReviewCountByFood(
+    foodId: string,
+    level: '1' | '2' | '3' | '4' | '5',
+  ): Promise<FindReviewCountDto> {
+    // 주어진 유저레벨 대해, 음식의 맵기 정도 평가 (hotLevelId) count하기
+    const hotLevelCount = await this.reviewRepository
+      .createQueryBuilder('review')
+      .select('review.hotLevelId')
+      .addSelect('COUNT(*) AS count')
+      .leftJoin('review.tasteReviews', 'tasteTag')
+      .leftJoin('review.user', 'user')
+      .where('review.foodId = :foodId', { foodId })
+      .andWhere('user.userLevelId = :level', { level })
+      .groupBy('review.hotLevelId')
+      .getRawMany()
+      .then((textRows) => {
+        // SQL에서 COUNT(*)를 하게 되면 존재하는 row만 가져오기 때문에, 미리 객체를 [key]: 0 으로 초기화해 둡니다. (데이터가 없을 경우 0으로 내려주기 위함)
+        const hotLevelCount = Object.keys(HOT_LEVEL).reduce((prev, curr) => {
+          if (curr === HOT_LEVEL.NEVER_TRIED) {
+            return prev;
+          }
+          return { ...prev, [curr]: 0 };
+        }, {} as HotLevelCountType);
+
+        textRows.forEach((row) => {
+          const { hotLevelId, count } = row;
+          const tasteTag = produceHotLevelString(hotLevelId);
+
+          // count를 number 형태로 내려줍니다
+          hotLevelCount[tasteTag] = Number(count);
+        });
+
+        return hotLevelCount;
+      });
+
+    // 주어진 유저레벨 대해, 음식의 맛 태그 평가 (hotLevelId) count하기
+    const tasteTagCount = await this.reviewRepository
+      .createQueryBuilder('review')
+      .select('tasteTag.id')
+      .addSelect('COUNT(*) AS count')
+      .leftJoin('review.tasteReviews', 'tasteTag')
+      .leftJoin('review.user', 'user')
+      .where('review.foodId = :foodId', { foodId })
+      .andWhere('user.userLevelId = :level', { level })
+      .groupBy('tasteTag.id')
+      .getRawMany()
+      .then((textRows) => {
+        // SQL에서 COUNT(*)를 하게 되면 존재하는 row만 가져오기 때문에, 미리 객체를 [key]: 0 으로 초기화해 둡니다. (데이터가 없을 경우 0으로 내려주기 위함)
+        const tasteTagCount = Object.keys(TASTE_TAG).reduce((prev, curr) => {
+          return { ...prev, [TASTE_TAG[curr]]: 0 };
+        }, {} as TasteTagCountType);
+
+        textRows.forEach((row) => {
+          const { tasteTag_id: tasteTagId, count } = row;
+          const tasteTag = produceTasteTagString(tasteTagId);
+
+          // count를 number 형태로 내려줍니다
+          tasteTagCount[tasteTag] = Number(count);
+        });
+
+        return tasteTagCount;
+      });
+
+    return { hotLevelCount, tasteTagCount };
   }
 }
