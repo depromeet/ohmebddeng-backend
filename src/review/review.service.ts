@@ -76,7 +76,7 @@ export class ReviewService {
     };
   }
 
-  async findReviewByfoodId(foodId: number) {
+  async findReviewByfoodId(foodId: string) {
     return this.reviewRepository
       .createQueryBuilder('review')
       .leftJoin('review.food', 'food')
@@ -102,7 +102,7 @@ export class ReviewService {
       );
   }
 
-  async findReviewsByUser(userId: number) {
+  async findReviewsByUserId(userId: string) {
     return this.reviewRepository
       .createQueryBuilder('review')
       .leftJoinAndSelect('review.food', 'food')

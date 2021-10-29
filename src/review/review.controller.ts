@@ -81,10 +81,10 @@ export class ReviewController {
     description: '해당하는 리뷰에 대한 정보를 받는다.',
     type: [OmitType(Review, [])],
   })
-  findReviewsByUser(
+  findReviewsByUserId(
     @Param() params,
   ): Promise<(Omit<Review, 'hotLevel'> & { hotLevel: HOT_LEVEL })[]> {
-    return this.reviewService.findReviewsByUser(params.userId);
+    return this.reviewService.findReviewsByUserId(params.userId);
   }
 
   @Get('food/count/:foodId')
