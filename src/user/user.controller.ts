@@ -74,7 +74,7 @@ export class UserController {
   @Post('level')
   @ApiOperation({
     summary: '사용자 레벨테스트 결과 제출 API',
-    description: `레벨테스트 응답결과를 제출하고 사용자의 레벨을 받는다. (참고) hotLevel =  "EASY" | "NORMAL" | "HOT" | "HOTTEST"`,
+    description: `레벨테스트 응답결과를 제출하고 사용자의 레벨을 받는다. (참고) hotLevel =  "냠냠" | "쓰읍" | "씁하" | "헥헥" | "모름"`,
   })
   @ApiBody({ type: updateUserLevelDto })
   @ApiResponse({
