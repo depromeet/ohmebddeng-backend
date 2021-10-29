@@ -19,6 +19,7 @@ interface IFoodLevel {
 import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
 import { FindUserCountDto } from './dto/find-user-count.dto';
 import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
+import { FindUserDto } from './dto/find-user.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -36,13 +37,32 @@ export class UserService {
     const { anonymousId, id: userId } = await this.userRepository.save(user);
     return { anonymousId, userId };
   }
-
-  findUser(userId: string): Promise<User> {
+  /**
+   * 사용자 id를 기반으로 해당 사용자의 정보를 가져오는 API
+   * @param userId 사용자 id를 param으로 받음
+   * @returns 사용자 정보, 사용자 레벨 정보, 사용자의 리뷰 정보
+   */
+  async findUser(userId: string): Promise<FindUserDto> {
     return this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userLevel', 'userLevel')
+      .leftJoinAndSelect('userLevel.userLevelDetail', 'userLevelDetail')
       .where('user.id = :userId', { userId })
-      .getOne();
+      .getOne()
+      .then((user) => {
+        // Return 타입 변경
+        // isDeleted, role을 빼고 보냄
+        const { userLevel, isDeleted, role, ...userRest } = user;
+
+        const { id, name, imageUrl, summary, description, userLevelDetail } =
+          userLevel;
+        const details = userLevelDetail.map(({ detail }) => detail);
+
+        return {
+          ...userRest,
+          userLevel: { id, name, imageUrl, summary, description, details },
+        };
+      });
   }
 
   async updateUserLevel(params: updateUserLevelDto): Promise<FindUserLevelDto> {
@@ -106,7 +126,7 @@ export class UserService {
       .where('id = :id', { id: userId })
       .execute();
 
-    // // return userLevel
+    // return userLevel
     return this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.userLevel', 'userLevel')
