@@ -146,7 +146,7 @@ export class ReviewService {
       .then((textRows) => {
         // SQL에서 COUNT(*)를 하게 되면 존재하는 row만 가져오기 때문에, 미리 객체를 [key]: 0 으로 초기화해 둡니다. (데이터가 없을 경우 0으로 내려주기 위함)
         const hotLevelCount = Object.keys(HOT_LEVEL).reduce((prev, curr) => {
-          if (curr === HOT_LEVEL.NEVER_TRIED) {
+          if (HOT_LEVEL[curr] === HOT_LEVEL.NEVER_TRIED) {
             return prev;
           }
           return { ...prev, [HOT_LEVEL[curr]]: 0 };
