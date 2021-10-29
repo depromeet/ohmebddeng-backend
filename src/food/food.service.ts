@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { produceHotLevelId } from 'src/review/utils/produce-hot-level';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { CreateFoodDto } from './dto/create-food.dto';
 import { FindFoodDto } from './dto/find-food.dto';
 import { FindFoodsQueryDto } from './dto/find-foods-query.dto';
@@ -148,5 +148,29 @@ export class FoodService {
       .andWhere('foodLevel.id = :hotLevelId', { hotLevelId });
 
     return sortBy(query, sort).take(size).getMany().then(produceFindFoodDto);
+  }
+
+  // 레벨 별 음식 정보를 가져 옵니다.
+  async findUserLevelFoods(param): Promise<Food[]> {
+    const { userLevel } = param;
+
+    if (Number(userLevel) < 1 || Number(userLevel) > 4) {
+      return [];
+    }
+
+    const { id: foodLevel } = await this.foodLevelRepository
+      .createQueryBuilder('foodLevel')
+      .leftJoinAndSelect('foodLevel.userLevel', 'userLevel')
+      .where('foodLevel.userLevel = :userLevel', { userLevel })
+      .getOne();
+
+    return await this.foodRepository
+      .createQueryBuilder('food')
+      .leftJoinAndSelect('food.foodLevel', 'foodLevel')
+      .select(['food.name', 'food.subName', 'food.imageUrl'])
+      .where('food.foodLevel = :foodLevel', { foodLevel })
+      .orderBy('RAND()')
+      .limit(3)
+      .getMany();
   }
 }

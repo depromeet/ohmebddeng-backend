@@ -12,6 +12,7 @@ import {
 import { CreateFoodDto } from './dto/create-food.dto';
 import { FindFoodsQueryDto } from './dto/find-foods-query.dto';
 import { FindFoodDto } from './dto/find-food.dto';
+import { FindUserLevelFoodDto } from './dto/find-userLevel-food.dto';
 
 @Controller('food')
 @ApiTags('음식 API')
@@ -66,5 +67,22 @@ export class FoodController {
     @Body() createFoodDto: CreateFoodDto,
   ): Promise<CreateFoodDto> {
     return this.foodService.createFoodInfo(createFoodDto);
+  }
+
+  @Get('/tests/result')
+  @ApiOperation({
+    summary: '사용자 레벨별 음식 추천 API',
+    description: '사용자 레벨별 음식을 추천합니다.',
+  })
+  @ApiQuery({
+    name: 'userLevel',
+    type: FindUserLevelFoodDto,
+    description: '사용자 레벨',
+  })
+  @ApiCreatedResponse({ description: '레벨별 음식 정보', type: Food })
+  async findUserLevelFoods(
+    @Query() param: FindUserLevelFoodDto,
+  ): Promise<Food[]> {
+    return this.foodService.findUserLevelFoods(param);
   }
 }
