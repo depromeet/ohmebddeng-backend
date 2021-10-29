@@ -182,4 +182,20 @@ export class FoodService {
       .limit(1)
       .getOne();
   }
+
+  async findFoodByFoodId(
+    foodId: string,
+  ): Promise<Omit<FindFoodDto, 'hotLevel'>> {
+    return this.foodRepository
+      .createQueryBuilder('food')
+      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+      .where('food.id = :foodId', { foodId })
+      .getOne()
+      .then(({ id, name, subName, imageUrl }) => ({
+        id,
+        name,
+        subName,
+        imageUrl,
+      }));
+  }
 }
