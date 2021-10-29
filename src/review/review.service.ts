@@ -149,7 +149,7 @@ export class ReviewService {
           if (curr === HOT_LEVEL.NEVER_TRIED) {
             return prev;
           }
-          return { ...prev, [curr]: 0 };
+          return { ...prev, [HOT_LEVEL[curr]]: 0 };
         }, {} as HotLevelCountType);
 
         textRows.forEach((row) => {
