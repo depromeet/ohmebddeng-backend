@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { Review } from './entities/review.entity';
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -22,7 +13,6 @@ import {
   ApiParam,
   ApiTags,
   ApiQuery,
-  PartialType,
   OmitType,
 } from '@nestjs/swagger';
 import { HOT_LEVEL } from 'src/common/enums/hot-level';
