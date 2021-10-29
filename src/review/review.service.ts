@@ -13,6 +13,7 @@ import {
   produceHotLevelId,
   produceHotLevelString,
 } from './utils/produce-hot-level';
+import { FindReviewCountDto } from './dto/find-review-count.dto';
 
 @Injectable()
 export class ReviewService {
@@ -96,7 +97,7 @@ export class ReviewService {
       );
   }*/
 
-  async findReviewByfoodId(userLevel: string, foodId: number) {
+  async findReviewByfoodId(foodId: number) {
     return this.reviewRepository
       .createQueryBuilder('review')
       .leftJoin('review.food', 'food')
@@ -114,7 +115,6 @@ export class ReviewService {
       ])
       .where('review.foodId = :foodId', { foodId })
       .getMany()
-
       .then((reviews) =>
         reviews.map((review) => {
           const hotLevel = produceHotLevelString(review.hotLevel.id);
@@ -123,9 +123,7 @@ export class ReviewService {
       );
   }
 
-  
-
-  async findReviewByUserId(userId: number) {
+  async findReviewsByUser(userId: number) {
     return this.reviewRepository
       .createQueryBuilder('review')
       .leftJoinAndSelect('review.food', 'food')
@@ -151,5 +149,36 @@ export class ReviewService {
       );
   }
 
-
+  async findReviewCountByFood(
+    level: string,
+    foodId: string,
+  ): Promise<FindReviewCountDto> {
+    // 주어진 레벨의 유저에 대해, 음식의 맵기 정도 평가 (hotLevelId) count하기
+    /**
+SELECT 
+review.hotLevelId,
+    count(*)
+FROM
+    review
+        JOIN
+    review_taste_tag ON review.foodId = review_taste_tag.reviewFoodId
+        JOIN
+    user ON review.userId = user.id
+WHERE
+    review.foodId = 4 and user.userLevelId = 5
+    Group by review.hotLevelId;
+ */
+    // 주어진 레벨의 유저에 대해, 태그 count하기
+    /**
+SELECT 
+    tasteTagId, COUNT(*)
+FROM
+    review_taste_tag AS rtt
+    join user
+    on rtt.reviewUserId = user.id
+    where user.userLevelId = 5 and rtt.reviewUserId = 1
+GROUP BY rtt.tasteTagId;
+ */
+    return {} as FindReviewCountDto;
+  }
 }
