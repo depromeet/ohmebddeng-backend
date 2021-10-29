@@ -39,22 +39,6 @@ export class FoodController {
     return this.foodService.findFoods(params);
   }
 
-  @Get(':foodId')
-  @ApiOperation({
-    summary: '음식id 기반으로 해당 음식의 데이터를 가져오는 API',
-    description: '음식 id가 주어진다. 해당 음식의 데이터를 가져온다.',
-  })
-  @ApiParam({ name: '음식 id', type: String })
-  @ApiResponse({
-    description: '음식 리스트',
-    type: PickType(FindFoodDto, ['id', 'imageUrl', 'name', 'subName']),
-  })
-  async findFoodByFoodId(
-    @Param() param: { foodId: string },
-  ): Promise<Omit<FindFoodDto, 'hotLevel'>> {
-    return this.foodService.findFoodByFoodId(param.foodId);
-  }
-
   @Get('/reviews')
   @ApiOperation({
     summary: '리뷰할 음식 리스트를 가져오는 API',
@@ -113,5 +97,21 @@ export class FoodController {
   @ApiCreatedResponse({ description: '레벨별 음식 정보', type: RandomFoodDto })
   async findRandomFood(): Promise<RandomFoodDto> {
     return this.foodService.findRandomFoods();
+  }
+
+  @Get(':foodId')
+  @ApiOperation({
+    summary: '음식id 기반으로 해당 음식의 데이터를 가져오는 API',
+    description: '음식 id가 주어진다. 해당 음식의 데이터를 가져온다.',
+  })
+  @ApiParam({ name: '음식 id', type: String })
+  @ApiResponse({
+    description: '음식 리스트',
+    type: PickType(FindFoodDto, ['id', 'imageUrl', 'name', 'subName']),
+  })
+  async findFoodByFoodId(
+    @Param() param: { foodId: string },
+  ): Promise<Omit<FindFoodDto, 'hotLevel'>> {
+    return this.foodService.findFoodByFoodId(param.foodId);
   }
 }
