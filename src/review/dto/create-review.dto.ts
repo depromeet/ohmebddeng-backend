@@ -7,14 +7,18 @@ export class CreateReviewDto {
   @ApiProperty({
     description:
       "음식 레벨 ex) 'EASY', 'NORMAL', 'HOT', 'HOTTEST', 'NEVER_TRIED'",
+    type: HOT_LEVEL,
   })
   hotLevel: HOT_LEVEL;
+
   @IsString()
   @ApiProperty({ description: '사용자 id' })
   userId: string;
+
   @IsString()
   @ApiProperty({ description: '음식 id' })
   foodId: string;
+
   @IsString({ each: true })
   @ApiProperty({ description: '음식 태그 id' })
   tagIds: string[];

@@ -7,6 +7,7 @@ export class ReviewDto {
   @ApiProperty({
     description:
       "음식 레벨 ex) 'EASY', 'NORMAL', 'HOT', 'HOTTEST', 'NEVER_TRIED'",
+    type: HOT_LEVEL,
   })
   hotLevel: HOT_LEVEL;
 
