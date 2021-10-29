@@ -77,33 +77,6 @@ export class ReviewService {
     };
   }
 
-  /*
-  async findReviewByfoodId(foodId: number) {
-    return this.reviewRepository
-      .createQueryBuilder('review')
-      .leftJoin('review.food', 'food')
-      .leftJoin('review.user', 'user')
-      .leftJoin('review.hotLevel', 'hotLevel')
-      .leftJoin('review.tasteReviews', 'review_taste_tag')
-      .select([
-        'review',
-        'food.id',
-        'food.name',
-        'user.id',
-        'hotLevel',
-        'review_taste_tag.id',
-        'review_taste_tag.name',
-      ])
-      .where('review.foodId = :foodId', { foodId })
-      .getMany()
-      .then((reviews) =>
-        reviews.map((review) => {
-          const hotLevel = produceHotLevelString(review.hotLevel.id);
-          return { ...review, hotLevel };
-        }),
-      );
-  }*/
-
   async findReviewByfoodId(foodId: number) {
     return this.reviewRepository
       .createQueryBuilder('review')
