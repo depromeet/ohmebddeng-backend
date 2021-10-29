@@ -1,13 +1,16 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { FoodService } from './food.service';
 import { Food } from './entities/food.entity';
 import {
   ApiBody,
   ApiCreatedResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiResponse,
   ApiTags,
+  OmitType,
+  PickType,
 } from '@nestjs/swagger';
 import { CreateFoodDto } from './dto/create-food.dto';
 import { FindFoodsQueryDto } from './dto/find-foods-query.dto';
@@ -34,6 +37,22 @@ export class FoodController {
   @ApiResponse({ description: '음식 리스트', type: FindFoodDto })
   async findFoods(@Query() params: FindFoodsQueryDto): Promise<FindFoodDto[]> {
     return this.foodService.findFoods(params);
+  }
+
+  @Get(':foodId')
+  @ApiOperation({
+    summary: '음식id 기반으로 해당 음식의 데이터를 가져오는 API',
+    description: '음식 id가 주어진다. 해당 음식의 데이터를 가져온다.',
+  })
+  @ApiParam({ name: '음식 id', type: String })
+  @ApiResponse({
+    description: '음식 리스트',
+    type: PickType(FindFoodDto, ['id', 'imageUrl', 'name', 'subName']),
+  })
+  async findFoodByFoodId(
+    @Param() param: { foodId: string },
+  ): Promise<Omit<FindFoodDto, 'hotLevel'>> {
+    return this.foodService.findFoodByFoodId(param.foodId);
   }
 
   @Get('/reviews')
