@@ -3,11 +3,11 @@ import { IsObject } from 'class-validator';
 import { HOT_LEVEL } from 'src/common/enums/hot-level';
 import { TASTE_TAG } from 'src/common/enums/taste-tag';
 
-type HotLevelCountType = {
+export type HotLevelCountType = {
   [key in HOT_LEVEL]: number;
 };
 
-type TasteTagCountType = {
+export type TasteTagCountType = {
   [key in TASTE_TAG]: number;
 };
 
@@ -16,7 +16,7 @@ export class FindReviewCountDto {
   @ApiProperty({
     description: '음식의 맵기 레벨에 대한 다른 사용자들의 평가 통계',
   })
-  hotLevelCount: HotLevelCountType;
+  hotLevelCount: Omit<HotLevelCountType, HOT_LEVEL.NEVER_TRIED>;
 
   @IsObject()
   @ApiProperty({
