@@ -39,7 +39,6 @@ export class ReviewService {
       tagIds.map(async (tag) => {
         const tagid = produceTasteTagId(tag)
         const Tag = getRepository(TasteTag).findOne(tagid);
-        console.log(tagid)
         return Tag;
       }),
     );
@@ -63,9 +62,10 @@ export class ReviewService {
       review.food = await getRepository(Food).findOne(foodId);
       review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
       review.tasteReviews = await Promise.all(
-        tagIds.map(async (tagid) => {
-          const tag = getRepository(TasteTag).findOne(tagid);
-          return tag;
+        tagIds.map(async (tag) => {
+          const tagid = produceTasteTagId(tag)
+          const Tag = getRepository(TasteTag).findOne(tagid);
+          return Tag;
         }),
       );
       return this.reviewRepository.save(review);
