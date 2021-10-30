@@ -16,3 +16,20 @@ export const produceTasteTagString = (tasteTagId: string): TASTE_TAG => {
       return TASTE_TAG.GAEUN;
   }
 };
+
+export const produceTasteTagId = (tasteTagId: TASTE_TAG): string => {
+  switch (tasteTagId) {
+    case TASTE_TAG.EOLEOL:
+      return '1';
+    case TASTE_TAG.KALKAL:
+      return '2';
+    case TASTE_TAG.MAECOMDALCOM:
+      return '3';
+    case TASTE_TAG.ALSSA:
+      return '4';
+    case TASTE_TAG.EOLKEUN:
+      return '5';
+    default:
+      return '6';
+  }
+};

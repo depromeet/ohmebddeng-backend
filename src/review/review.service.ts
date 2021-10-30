@@ -17,7 +17,7 @@ import {
   HotLevelCountType,
   TasteTagCountType,
 } from './dto/find-review-count.dto';
-import { produceTasteTagString } from './utils/produceTasteTag';
+import { produceTasteTagString, produceTasteTagId } from './utils/produceTasteTag';
 import { HOT_LEVEL } from 'src/common/enums/hot-level';
 import { TASTE_TAG } from 'src/common/enums/taste-tag';
 
@@ -32,14 +32,15 @@ export class ReviewService {
     const { hotLevel, userId, foodId, tagIds } = reviewDetails;
     const review = new Review();
     const hotLevelId = produceHotLevelId(hotLevel);
-
     review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
     review.user = await getRepository(User).findOne(userId);
     review.food = await getRepository(Food).findOne(foodId);
     review.tasteReviews = await Promise.all(
-      tagIds.map(async (tagid) => {
-        const tag = getRepository(TasteTag).findOne(tagid);
-        return tag;
+      tagIds.map(async (tag) => {
+        const tagid = produceTasteTagId(tag)
+        const Tag = getRepository(TasteTag).findOne(tagid);
+        console.log(tagid)
+        return Tag;
       }),
     );
 
