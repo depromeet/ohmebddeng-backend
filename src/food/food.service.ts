@@ -43,6 +43,7 @@ export class FoodService {
       .createQueryBuilder('food')
       .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
       .where('food.isTest = true')
+      .orderBy('RAND()')
       .getMany();
   }
 
