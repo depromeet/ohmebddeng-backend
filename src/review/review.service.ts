@@ -7,7 +7,7 @@ import { User } from '../user/entities/user.entity';
 import { Food } from '../food/entities/food.entity';
 import { TasteTag } from '../review/entities/taste_tag.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, getRepository } from 'typeorm';
+import { Repository, getRepository, In } from 'typeorm';
 import {
   produceHotLevelId,
   produceHotLevelString,
@@ -29,19 +29,15 @@ export class ReviewService {
   ) {}
 
   async createReview(reviewDetails: CreateReviewDto) {
-    const { hotLevel, userId, foodId, tagIds } = reviewDetails;
+    const { hotLevel, userId, foodId, tags } = reviewDetails;
     const review = new Review();
     const hotLevelId = produceHotLevelId(hotLevel);
     review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
     review.user = await getRepository(User).findOne(userId);
     review.food = await getRepository(Food).findOne(foodId);
-    review.tasteReviews = await Promise.all(
-      tagIds.map(async (tag) => {
-        const tagid = produceTasteTagId(tag)
-        const Tag = getRepository(TasteTag).findOne(tagid);
-        return Tag;
-      }),
-    );
+    review.tasteReviews = await getRepository(TasteTag).find({
+      name: In(tags),
+    });
 
     const result = await this.reviewRepository.save(review);
 
@@ -54,20 +50,17 @@ export class ReviewService {
   async createReviews(reviewsDetails: CreateReviewsDto) {
     const { userId, reviewList } = reviewsDetails;
 
-    reviewList.map(async ({ foodId, hotLevel, tagIds }) => {
+    reviewList.map(async ({ foodId, hotLevel, tags }) => {
       const review = new Review();
       const hotLevelId = produceHotLevelId(hotLevel);
 
       review.user = await getRepository(User).findOne(userId);
       review.food = await getRepository(Food).findOne(foodId);
       review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
-      review.tasteReviews = await Promise.all(
-        tagIds.map(async (tag) => {
-          const tagid = produceTasteTagId(tag)
-          const Tag = getRepository(TasteTag).findOne(tagid);
-          return Tag;
-        }),
-      );
+      review.tasteReviews = await getRepository(TasteTag).find({
+        name: In(tags),
+      });
+      
       return this.reviewRepository.save(review);
     });
 
