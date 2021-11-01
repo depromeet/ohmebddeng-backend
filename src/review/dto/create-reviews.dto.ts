@@ -1,6 +1,7 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { IsString, IsArray, IsEnum } from 'class-validator';
 import { HOT_LEVEL } from 'src/common/enums/hot-level';
+import { TASTE_TAG } from 'src/common/enums/taste-tag';
 
 export class ReviewDto {
   @IsEnum(HOT_LEVEL)
@@ -14,9 +15,9 @@ export class ReviewDto {
   @ApiProperty({ description: '음식 id' })
   foodId: string;
 
-  @IsString({ each: true })
-  @ApiProperty({ description: '음식 맛평가 태그 id' })
-  tagIds: string[];
+  @IsEnum(TASTE_TAG, {each: true})
+  @ApiProperty({ description: "음식 태그 ex) '얼얼한', '칼칼한', '매콤달콤한', '알싸한', '얼큰한', '개운한'", })
+  tags: TASTE_TAG[];
 }
 
 export class CreateReviewsDto {
