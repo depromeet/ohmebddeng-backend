@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { FindUserCountDto } from './dto/find-user-count.dto';
 
@@ -68,9 +68,12 @@ export class UserController {
     type: FindUserDto,
   })
   async findUser(
+    @Req() req,
     @Param() params,
   ): Promise<FindUserDto | Omit<FindUserDto, 'userLevel'>> {
-    return this.userService.findUser(params.userId);
+    const anonymousId = req.headers.authorization.split(' ').pop();
+
+    return this.userService.findUser(params.userId, anonymousId);
   }
   // 사용자 레벨 테스트 제출
   @Post('level')
