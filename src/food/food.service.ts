@@ -193,6 +193,10 @@ export class FoodService {
       .where('user.id = :userId', { userId })
       .getOne();
 
+    if (userlevel.id === '5') {
+      userlevel.id = '4';
+    }
+
     return await this.foodRepository
       .createQueryBuilder('food')
       .leftJoinAndSelect('food.foodLevel', 'foodLevel')
