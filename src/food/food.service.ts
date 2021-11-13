@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { produceHotLevelId } from 'src/review/utils/produce-hot-level';
-import { Not, Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { Repository } from 'typeorm';
 import { CreateFoodDto } from './dto/create-food.dto';
 import { FindFoodDto, RandomFoodDto } from './dto/find-food.dto';
 import { FindFoodsQueryDto } from './dto/find-foods-query.dto';
@@ -22,10 +23,14 @@ export class FoodService {
 
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {
     this.foodRepository = foodRepository;
     this.foodLevelRepository = foodLevelRepository;
     this.categoryRepository = categoryRepository;
+    this.userRepository = userRepository;
   }
 
   async findReviewFoods(): Promise<Food[]> {
@@ -175,12 +180,24 @@ export class FoodService {
       .getMany();
   }
 
-  async findRandomFoods(): Promise<RandomFoodDto> {
+  async findRandomFoods(userId): Promise<RandomFoodDto> {
+    const { userLevel: userlevel } = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userLevel', 'userLevel')
+      .select()
+      .where('user.id = :userId', { userId })
+      .getOne();
+
+    if (userlevel.id === '5') {
+      userlevel.id = '4';
+    }
+
     return await this.foodRepository
       .createQueryBuilder('food')
+      .leftJoinAndSelect('food.foodLevel', 'foodLevel')
       .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+      .where('food.foodLevel = :foodLevel', { foodLevel: userlevel.id })
       .orderBy('RAND()')
-      .limit(1)
       .getOne();
   }
 

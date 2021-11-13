@@ -94,9 +94,12 @@ export class FoodController {
     summary: '음식 랜덤 추천 API',
     description: '음식을 랜덤 추천합니다.',
   })
-  @ApiCreatedResponse({ description: '레벨별 음식 정보', type: RandomFoodDto })
-  async findRandomFood(): Promise<RandomFoodDto> {
-    return this.foodService.findRandomFoods();
+  @ApiQuery({ name: 'userId', type: String, description: '사용자 ID' })
+  @ApiResponse({ description: '레벨별 음식 정보', type: RandomFoodDto })
+  async findRandomFood(
+    @Query() param: { userId: string },
+  ): Promise<RandomFoodDto> {
+    return this.foodService.findRandomFoods(param.userId);
   }
 
   @Get(':foodId')
