@@ -5,7 +5,6 @@ import {
   ExceptionFilter,
   HttpException,
 } from '@nestjs/common';
-// import axios from 'axios';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
@@ -22,11 +21,11 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
         text: `
           🚨 *사용자 오류 발생* 🚨
 
-            *✔️ Error Name:* ${exception.name}
-            *✔️ message:* ${exception.message}
-            *✔️ url:* ${request.url}
+            *✔️ 에러 명:* ${exception.name}
+            *✔️ 메세지:* ${exception.message}
+            *✔️ URL:* ${request.url}
 
-            *✔️ stack*
+            *✔️ 스택 확인*
                 ${exception.stack}
           `,
       })
