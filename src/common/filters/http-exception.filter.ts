@@ -19,7 +19,7 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
     // Log on slack
     this.httpService
       .post(
-        'https://hooks.slack.com/services/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',
+        'https://hooks.slack.com/services/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',
         {
           text: `
           🚨 *사용자 오류 발생* 🚨
