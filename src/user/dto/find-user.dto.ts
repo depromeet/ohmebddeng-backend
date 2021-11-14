@@ -20,6 +20,9 @@ class UserLevelDto {
 
   @ApiProperty({ description: 'detail' })
   details: string[];
+
+  @ApiProperty({ description: 'level' })
+  level: number;
 }
 
 export class FindUserDto

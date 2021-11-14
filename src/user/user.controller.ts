@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { FindUserCountDto } from './dto/find-user-count.dto';
 
@@ -6,6 +6,7 @@ import { updateUserLevelDto } from './dto/create-user-level.dto';
 import { FindUserLevelDto } from './dto/find-user-level.dto';
 import {
   ApiBody,
+  ApiHeader,
   ApiOperation,
   ApiParam,
   ApiQuery,
@@ -62,15 +63,19 @@ export class UserController {
     summary: '사용자 ID 기반 사용자 정보 조회 API',
     description: '사용자 ID를 기반으로 사용자를 찾아 반환한다',
   })
+  @ApiHeader({ name: 'authorization: Bearer + anonymousId' })
   @ApiParam({ name: '사용자ID', type: String })
   @ApiResponse({
     description: '사용자에 대한 정보를 받는다',
     type: FindUserDto,
   })
   async findUser(
+    @Req() req,
     @Param() params,
   ): Promise<FindUserDto | Omit<FindUserDto, 'userLevel'>> {
-    return this.userService.findUser(params.userId);
+    const anonymousId = req.headers.authorization.split(' ').pop();
+
+    return this.userService.findUser(params.userId, anonymousId);
   }
   // 사용자 레벨 테스트 제출
   @Post('level')
@@ -78,6 +83,7 @@ export class UserController {
     summary: '사용자 레벨테스트 결과 제출 API',
     description: `레벨테스트 응답결과를 제출하고 사용자의 레벨을 받는다. (참고) hotLevel =  "냠냠" | "쓰읍" | "씁하" | "헥헥" | "모름"`,
   })
+  @ApiHeader({ name: 'authorization: Bearer + anonymousId' })
   @ApiBody({ type: updateUserLevelDto })
   @ApiResponse({
     description: '사용자의 ID와 레벨을 받는다',
@@ -85,8 +91,10 @@ export class UserController {
     type: FindUserLevelDto,
   })
   async updateUserLevel(
+    @Req() req,
     @Body() params: updateUserLevelDto,
   ): Promise<FindUserLevelDto> {
-    return this.userService.updateUserLevel(params);
+    const anonymousId = req.headers.authorization.split(' ').pop();
+    return this.userService.updateUserLevel(params, anonymousId);
   }
 }

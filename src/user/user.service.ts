@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -37,6 +37,21 @@ export class UserService {
     const { anonymousId, id: userId } = await this.userRepository.save(user);
     return { anonymousId, userId };
   }
+
+  async validateUser(userId: string, anonymousId: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userLevel', 'userLevel')
+      .leftJoinAndSelect('userLevel.userLevelDetail', 'userLevelDetail')
+      .where('user.id = :userId', { userId })
+      .andWhere('user.anonymousId = :anonymousId', { anonymousId })
+      .getOne();
+    if (!user) {
+      throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
+    }
+    return user;
+  }
+
   /**
    * 사용자 id를 기반으로 해당 사용자의 정보를 가져오는 API
    * @param userId 사용자 id를 param으로 받음
@@ -44,23 +59,30 @@ export class UserService {
    */
   async findUser(
     userId: string,
+    anonymousId: string,
   ): Promise<FindUserDto | Omit<FindUserDto, 'userLevel'>> {
+    await this.validateUser(userId, anonymousId);
     const query = this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userLevel', 'userLevel')
       .leftJoinAndSelect('userLevel.userLevelDetail', 'userLevelDetail')
       .where('user.id = :userId', { userId })
+      .andWhere('user.anonymousId = :anonymousId', { anonymousId })
       .getOne();
 
-    return this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.userLevel', 'userLevel')
-      .leftJoinAndSelect('userLevel.userLevelDetail', 'userLevelDetail')
-      .where('user.id = :userId', { userId })
-      .getOne()
+    return query
+      .catch((e) => {
+        throw new HttpException(
+          'Internal Server Error',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      })
       .then((user) => {
         // Return 타입 변경
         // isDeleted, role을 빼고 보냄
+        if (!user) {
+          throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
+        }
         const { userLevel, isDeleted, role, ...userRest } = user;
 
         // 사용자가 레벨테스트를 진행하지 않아 레벨이 없을 경우, userRest return합니다
@@ -94,10 +116,16 @@ export class UserService {
       });
   }
 
-  async updateUserLevel(params: updateUserLevelDto): Promise<FindUserLevelDto> {
+  async updateUserLevel(
+    params: updateUserLevelDto,
+    anonymousId: string,
+  ): Promise<FindUserLevelDto> {
     let userLevel = new UserLevel();
 
     const { userId, answers } = params;
+
+    // validate user with anonymousId
+    await this.validateUser(userId, anonymousId);
 
     // get each food level
     const foodIds = answers.map(({ foodId }) => foodId);
