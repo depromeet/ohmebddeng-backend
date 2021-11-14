@@ -18,10 +18,8 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
 
     // Log on slack
     this.httpService
-      .post(
-        'https://hooks.slack.com/services/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',
-        {
-          text: `
+      .post(process.env.SLACK_WEBHOOK, {
+        text: `
           🚨 *사용자 오류 발생* 🚨
 
             *✔️ Error Name:* ${exception.name}
@@ -31,8 +29,7 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
             *✔️ stack*
                 ${exception.stack}
           `,
-        },
-      )
+      })
       .subscribe();
 
     response.status(200).json({
