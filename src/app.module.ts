@@ -9,13 +9,16 @@ import { ReviewModule } from './review/review.module';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
-
+import { HttpModule } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     TypeOrmModule.forRoot({ autoLoadEntities: true }),
     UserModule,
     FoodModule,
     ReviewModule,
+    HttpModule,
+    ConfigModule.forRoot({ isGlobal: true }),
   ], // ormconfig.json값을 가져옴
   controllers: [AppController],
   providers: [
