@@ -3,17 +3,22 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    cors: {
-      origin: [
+const origin =
+  process.env.NODE_ENV === 'development'
+    ? [
         'http://localhost:3000',
         'http://127.0.0.1:3000',
         'https://ohmebddeng.kr',
         'https://www.ohmebddeng.kr',
         'https://ohmebddeng-frontend.vercel.app',
         'https://ohmebddeng-frontend-git-develop-waterplease.vercel.app',
-      ],
+      ]
+    : ['https://ohmebddeng.kr', 'https://www.ohmebddeng.kr'];
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule, {
+    cors: {
+      origin,
       credentials: true,
     },
   });
