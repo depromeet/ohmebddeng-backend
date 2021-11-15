@@ -15,7 +15,7 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
     const request = ctx.getRequest();
     const statusCode = exception.getStatus();
 
-    // Log on slack only in production mode
+    // production에서만 에러 내용을 슬랙에 로깅함
     if (process.env.NODE_ENV === 'production') {
       this.httpService
         .post(process.env.SLACK_WEBHOOK, {

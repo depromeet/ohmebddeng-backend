@@ -3,6 +3,11 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
+/**
+ * dev/prod에 따라 access-control-allow-origin을 다르게 적용함
+ * DEV: localhost, dev 배포된 front-end app, prod 배포된 front-end app
+ * PROD: ohmebddeng.kr, www.ohmebddeng.kr
+ */
 const origin =
   process.env.NODE_ENV === 'development'
     ? [
