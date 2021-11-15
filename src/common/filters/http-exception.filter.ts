@@ -15,21 +15,20 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
     const request = ctx.getRequest();
     const statusCode = exception.getStatus();
 
-    // Log on slack
-    this.httpService
-      .post(process.env.SLACK_WEBHOOK, {
-        text: `
+    // Log on slack only in production mode
+    if (process.env.NODE_ENV === 'production') {
+      this.httpService
+        .post(process.env.SLACK_WEBHOOK, {
+          text: `
           🚨 *사용자 오류 발생* 🚨
 
             *✔️ 에러 명:* ${exception.name}
             *✔️ 메세지:* ${exception.message}
             *✔️ URL:* ${request.url}
-
-            *✔️ 스택 확인*
-                ${exception.stack}
           `,
-      })
-      .subscribe();
+        })
+        .subscribe();
+    }
 
     response.status(200).json({
       statusCode,
