@@ -16,7 +16,7 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
     const statusCode = exception.getStatus();
 
     // production에서만 에러 내용을 슬랙에 로깅함
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production' && request.url.match('v1')) {
       this.httpService
         .post(process.env.SLACK_WEBHOOK, {
           text: `
