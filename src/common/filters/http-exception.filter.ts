@@ -25,6 +25,8 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
             *✔️ 에러 명:* ${exception.name}
             *✔️ 메세지:* ${exception.message}
             *✔️ URL:* ${request.url}
+            *✔️ user-agent:* ${request.headers['user-agent']}
+            *✔️ host:* ${request.headers.host}
           `,
         })
         .subscribe();
