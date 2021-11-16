@@ -1,7 +1,9 @@
 import { Repository } from 'typeorm';
 
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+
+import { ERROR_MESSAGE } from '@common/enums/error-message';
 
 import { User } from '@user/entities/user.entity';
 
@@ -38,70 +40,114 @@ export class FoodService {
   }
 
   async findReviewFoods(): Promise<Food[]> {
-    return await this.foodRepository
-      .createQueryBuilder('food')
-      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
-      .where('food.isTest = true')
-      .orderBy('RAND()')
-      .limit(3)
-      .getMany();
+    try {
+      const foods: Food[] = await this.foodRepository
+        .createQueryBuilder('food')
+        .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+        .where('food.isTest = true')
+        .orderBy('RAND()')
+        .limit(3)
+        .getMany();
+
+      return foods;
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: ERROR_MESSAGE.NOT_FOUND,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async findTestFoods(): Promise<Food[]> {
-    return await this.foodRepository
-      .createQueryBuilder('food')
-      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
-      .where('food.isTest = true')
-      .orderBy('RAND()')
-      .getMany();
+    try {
+      const foods: Food[] = await this.foodRepository
+        .createQueryBuilder('food')
+        .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+        .where('food.isTest = true')
+        .orderBy('RAND()')
+        .getMany();
+
+      return foods;
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: ERROR_MESSAGE.NOT_FOUND,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async createFoodInfo(foodDetail: CreateFoodDto): Promise<CreateFoodDto> {
-    const { name, subName, level, category } = foodDetail;
+    try {
+      const { name, subName, level, category } = foodDetail;
 
-    // foodLevelId을 사용하여 foodLevel 정보를 가져옴
-    const foodLevel = await this.foodLevelRepository
-      .createQueryBuilder('foodLevel')
-      .select()
-      .where('foodLevel.id = :level', { level })
-      .getOne();
+      // foodLevelId을 사용하여 foodLevel 정보를 가져옴
+      const foodLevel = await this.foodLevelRepository
+        .createQueryBuilder('foodLevel')
+        .select()
+        .where('foodLevel.id = :level', { level })
+        .getOne();
 
-    // food 값 넣기
-    const { id: foodId } = await this.foodRepository
-      .createQueryBuilder('food')
-      .leftJoin('food.foodLevel', 'foodLevel')
-      .insert()
-      .into(Food)
-      .values({ name, subName, foodLevel })
-      .execute()
-      .then(({ identifiers }) => {
-        if (identifiers.length !== 1) {
-          // 하나의 음식만 추가하였으므로, 반드시 identifiers 길이는 반드시 1
-          throw new Error();
-        }
-        return identifiers.pop();
-      });
+      // food 값 넣기
+      const { id: foodId } = await this.foodRepository
+        .createQueryBuilder('food')
+        .leftJoin('food.foodLevel', 'foodLevel')
+        .insert()
+        .into(Food)
+        .values({ name, subName, foodLevel })
+        .execute()
+        .then(({ identifiers }) => {
+          if (identifiers.length !== 1) {
+            // 하나의 음식만 추가하였으므로, 반드시 identifiers 길이는 반드시 1
+            throw new Error();
+          }
+          return identifiers.pop();
+        })
+        .catch((e) => {
+          console.log(e);
+          throw new HttpException(
+            {
+              status: HttpStatus.BAD_REQUEST,
+              error: ERROR_MESSAGE.BAD_REQUEST,
+            },
+            HttpStatus.BAD_REQUEST,
+          );
+        });
 
-    //음식의 카테고리를 설정하기 위해서 categoryId값을 가져옴
-    const { id: categoryId } = await this.categoryRepository
-      .createQueryBuilder('category')
-      .select(['category.id'])
-      .where('category.name = :category', { category })
-      .getOne();
+      //음식의 카테고리를 설정하기 위해서 categoryId값을 가져옴
+      const { id: categoryId } = await this.categoryRepository
+        .createQueryBuilder('category')
+        .select(['category.id'])
+        .where('category.name = :category', { category })
+        .getOne();
 
-    // ManyToMany관계 -> 음식 카테고리 지정
-    await this.foodRepository
-      .createQueryBuilder('food_category')
-      .relation(Food, 'categories')
-      .of(foodId)
-      .add(categoryId);
+      // ManyToMany관계 -> 음식 카테고리 지정
+      await this.foodRepository
+        .createQueryBuilder('food_category')
+        .relation(Food, 'categories')
+        .of(foodId)
+        .add(categoryId);
 
-    return {
-      name,
-      subName,
-      level,
-      category,
-    };
+      return {
+        name,
+        subName,
+        level,
+        category,
+      };
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: ERROR_MESSAGE.NOT_FOUND,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   /**
@@ -114,14 +160,27 @@ export class FoodService {
    * @returns id, name, subName, imageUrl, hotLevel로 이루어진 객체의 배열
    */
   async findFoods(param: FindFoodsQueryDto): Promise<FindFoodDto[]> {
-    const { category, hotLevel, size: providedSize, sort } = param;
-    const size = providedSize ? Number(providedSize) : 10; // default size = 10
+    try {
+      const { category, hotLevel, size: providedSize, sort } = param;
+      const size = providedSize ? Number(providedSize) : 10; // default size = 10
 
-    // hotLevel 없이 요청이 온 경우
-    if (!hotLevel) {
-      // hotLevel 없고, category도 없는 경우
-      if (!category) {
-        const query = this.foodRepository.createQueryBuilder('food');
+      // hotLevel 없이 요청이 온 경우
+      if (!hotLevel) {
+        // hotLevel 없고, category도 없는 경우
+        if (!category) {
+          const query = this.foodRepository.createQueryBuilder('food');
+
+          return sortBy(query, sort)
+            .take(size)
+            .getMany()
+            .then(produceFindFoodDto);
+        }
+
+        // hotLevel만 없는 경우
+        const query = this.foodRepository
+          .createQueryBuilder('food')
+          .leftJoinAndSelect('food.categories', 'category')
+          .where('category.name = :categoryName', { categoryName: category });
 
         return sortBy(query, sort)
           .take(size)
@@ -129,95 +188,127 @@ export class FoodService {
           .then(produceFindFoodDto);
       }
 
-      // hotLevel만 없는 경우
+      // hotLevel이 있는 경우
+      const hotLevelId = produceHotLevelId(hotLevel);
+
+      // hotLevel은 있지만 category가 없는 경우
+      if (!category) {
+        const query = this.foodRepository
+          .createQueryBuilder('food')
+          .leftJoinAndSelect('food.foodLevel', 'foodLevel')
+          .where('foodLevel.id = :hotLevelId', { hotLevelId });
+
+        return sortBy(query, sort)
+          .take(size)
+          .getMany()
+          .then(produceFindFoodDto);
+      }
       const query = this.foodRepository
         .createQueryBuilder('food')
         .leftJoinAndSelect('food.categories', 'category')
-        .where('category.name = :categoryName', { categoryName: category });
-
-      return sortBy(query, sort).take(size).getMany().then(produceFindFoodDto);
-    }
-
-    // hotLevel이 있는 경우
-    const hotLevelId = produceHotLevelId(hotLevel);
-
-    // hotLevel은 있지만 category가 없는 경우
-    if (!category) {
-      const query = this.foodRepository
-        .createQueryBuilder('food')
         .leftJoinAndSelect('food.foodLevel', 'foodLevel')
-        .where('foodLevel.id = :hotLevelId', { hotLevelId });
+        .where('category.name = :categoryName', { categoryName: category })
+        .andWhere('foodLevel.id = :hotLevelId', { hotLevelId });
 
       return sortBy(query, sort).take(size).getMany().then(produceFindFoodDto);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: ERROR_MESSAGE.NOT_FOUND,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
-    const query = this.foodRepository
-      .createQueryBuilder('food')
-      .leftJoinAndSelect('food.categories', 'category')
-      .leftJoinAndSelect('food.foodLevel', 'foodLevel')
-      .where('category.name = :categoryName', { categoryName: category })
-      .andWhere('foodLevel.id = :hotLevelId', { hotLevelId });
-
-    return sortBy(query, sort).take(size).getMany().then(produceFindFoodDto);
   }
 
   // 레벨 별 음식 정보를 가져 옵니다.
   async findUserLevelFoods(param): Promise<Food[]> {
-    const { userLevel } = param;
+    try {
+      const { userLevel } = param;
 
-    if (Number(userLevel) < 1 || Number(userLevel) > 4) {
-      return [];
+      const { id: foodLevel } = await this.foodLevelRepository
+        .createQueryBuilder('foodLevel')
+        .leftJoinAndSelect('foodLevel.userLevel', 'userLevel')
+        .where('foodLevel.userLevel = :userLevel', { userLevel })
+        .getOne();
+
+      const foods: Food[] = await this.foodRepository
+        .createQueryBuilder('food')
+        .leftJoinAndSelect('food.foodLevel', 'foodLevel')
+        .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+        .where('food.foodLevel = :foodLevel', { foodLevel })
+        .orderBy('RAND()')
+        .limit(3)
+        .getMany();
+      return foods;
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: ERROR_MESSAGE.NOT_FOUND,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
-
-    const { id: foodLevel } = await this.foodLevelRepository
-      .createQueryBuilder('foodLevel')
-      .leftJoinAndSelect('foodLevel.userLevel', 'userLevel')
-      .where('foodLevel.userLevel = :userLevel', { userLevel })
-      .getOne();
-
-    return await this.foodRepository
-      .createQueryBuilder('food')
-      .leftJoinAndSelect('food.foodLevel', 'foodLevel')
-      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
-      .where('food.foodLevel = :foodLevel', { foodLevel })
-      .orderBy('RAND()')
-      .limit(3)
-      .getMany();
   }
 
   async findRandomFoods(userId): Promise<RandomFoodDto> {
-    const { userLevel: userlevel } = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.userLevel', 'userLevel')
-      .select()
-      .where('user.id = :userId', { userId })
-      .getOne();
+    try {
+      const { userLevel: userlevel } = await this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.userLevel', 'userLevel')
+        .select()
+        .where('user.id = :userId', { userId })
+        .getOne();
 
-    if (userlevel.id === '5') {
-      userlevel.id = '4';
+      if (userlevel.id === '5') {
+        userlevel.id = '4';
+      }
+
+      const food: RandomFoodDto = await this.foodRepository
+        .createQueryBuilder('food')
+        .leftJoinAndSelect('food.foodLevel', 'foodLevel')
+        .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+        .where('food.foodLevel = :foodLevel', { foodLevel: userlevel.id })
+        .orderBy('RAND()')
+        .getOne();
+      return food;
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: ERROR_MESSAGE.NOT_FOUND,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
-
-    return await this.foodRepository
-      .createQueryBuilder('food')
-      .leftJoinAndSelect('food.foodLevel', 'foodLevel')
-      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
-      .where('food.foodLevel = :foodLevel', { foodLevel: userlevel.id })
-      .orderBy('RAND()')
-      .getOne();
   }
 
   async findFoodByFoodId(
     foodId: string,
   ): Promise<Omit<FindFoodDto, 'hotLevel'>> {
-    return this.foodRepository
-      .createQueryBuilder('food')
-      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
-      .where('food.id = :foodId', { foodId })
-      .getOne()
-      .then(({ id, name, subName, imageUrl }) => ({
-        id,
-        name,
-        subName,
-        imageUrl,
-      }));
+    try {
+      const food = this.foodRepository
+        .createQueryBuilder('food')
+        .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+        .where('food.id = :foodId', { foodId })
+        .getOne()
+        .then(({ id, name, subName, imageUrl }) => ({
+          id,
+          name,
+          subName,
+          imageUrl,
+        }));
+      return food;
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: ERROR_MESSAGE.NOT_FOUND,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }
