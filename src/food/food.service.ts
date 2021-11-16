@@ -51,13 +51,7 @@ export class FoodService {
 
       return foods;
     } catch (e) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: ERROR_MESSAGE.NOT_FOUND,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -72,13 +66,7 @@ export class FoodService {
 
       return foods;
     } catch (e) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: ERROR_MESSAGE.NOT_FOUND,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -111,10 +99,7 @@ export class FoodService {
         .catch((e) => {
           console.log(e);
           throw new HttpException(
-            {
-              status: HttpStatus.BAD_REQUEST,
-              error: ERROR_MESSAGE.BAD_REQUEST,
-            },
+            ERROR_MESSAGE.BAD_REQUEST,
             HttpStatus.BAD_REQUEST,
           );
         });
@@ -140,13 +125,7 @@ export class FoodService {
         category,
       };
     } catch (e) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: ERROR_MESSAGE.NOT_FOUND,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -212,13 +191,7 @@ export class FoodService {
 
       return sortBy(query, sort).take(size).getMany().then(produceFindFoodDto);
     } catch (e) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: ERROR_MESSAGE.NOT_FOUND,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -243,13 +216,7 @@ export class FoodService {
         .getMany();
       return foods;
     } catch (e) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: ERROR_MESSAGE.NOT_FOUND,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -275,13 +242,7 @@ export class FoodService {
         .getOne();
       return food;
     } catch (e) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: ERROR_MESSAGE.NOT_FOUND,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -302,13 +263,7 @@ export class FoodService {
         }));
       return food;
     } catch (e) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: ERROR_MESSAGE.NOT_FOUND,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
   }
 }
