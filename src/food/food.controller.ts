@@ -1,6 +1,4 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { FoodService } from './food.service';
-import { Food } from './entities/food.entity';
 import {
   ApiBody,
   ApiCreatedResponse,
@@ -9,13 +7,14 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
-  OmitType,
   PickType,
 } from '@nestjs/swagger';
-import { CreateFoodDto } from './dto/create-food.dto';
-import { FindFoodsQueryDto } from './dto/find-foods-query.dto';
-import { FindFoodDto, RandomFoodDto } from './dto/find-food.dto';
-import { FindUserLevelFoodDto } from './dto/find-userLevel-food.dto';
+import { FoodService } from '@food/food.service';
+import { Food } from '@food/entities/food.entity';
+import { CreateFoodDto } from '@food/dto/create-food.dto';
+import { FindFoodsQueryDto } from '@food/dto/find-foods-query.dto';
+import { FindFoodDto, RandomFoodDto } from '@food/dto/find-food.dto';
+import { FindUserLevelFoodDto } from '@food/dto/find-userLevel-food.dto';
 
 @Controller('food')
 @ApiTags('음식 API')

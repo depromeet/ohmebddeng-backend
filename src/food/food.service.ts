@@ -1,16 +1,20 @@
+import { Repository } from 'typeorm';
+
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { produceHotLevelId } from 'src/review/utils/produce-hot-level';
-import { User } from 'src/user/entities/user.entity';
-import { Repository } from 'typeorm';
-import { CreateFoodDto } from './dto/create-food.dto';
-import { FindFoodDto, RandomFoodDto } from './dto/find-food.dto';
-import { FindFoodsQueryDto } from './dto/find-foods-query.dto';
-import { Category } from './entities/category.entity';
-import { Food } from './entities/food.entity';
-import { FoodLevel } from './entities/food_level.entity';
-import { produceFindFoodDto } from './utils/produceFindFoodDto';
-import { sortBy } from './utils/sortBy';
+
+import { User } from '@user/entities/user.entity';
+
+import { produceHotLevelId } from '@review/utils/produce-hot-level';
+
+import { CreateFoodDto } from '@food/dto/create-food.dto';
+import { FindFoodDto, RandomFoodDto } from '@food/dto/find-food.dto';
+import { FindFoodsQueryDto } from '@food/dto/find-foods-query.dto';
+import { Category } from '@food/entities/category.entity';
+import { Food } from '@food/entities/food.entity';
+import { FoodLevel } from '@food/entities/food_level.entity';
+import { produceFindFoodDto } from '@food/utils/produceFindFoodDto';
+import { sortBy } from '@food/utils/sortBy';
 
 @Injectable()
 export class FoodService {
