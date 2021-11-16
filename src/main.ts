@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { RequestMethod, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -20,6 +20,9 @@ const origin =
       ]
     : ['https://ohmebddeng.kr', 'https://www.ohmebddeng.kr'];
 
+const PORT = 3000;
+const PREFIX = '/v1';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: {
@@ -27,10 +30,10 @@ async function bootstrap() {
       credentials: true,
     },
   });
-  const port = 3000;
 
-  const prefix = '/v1';
-  app.setGlobalPrefix(prefix);
+  app.setGlobalPrefix(PREFIX, {
+    exclude: [{ path: '/', method: RequestMethod.GET }],
+  });
 
   const config = new DocumentBuilder()
     .setTitle('오맵땡 Server API')
@@ -41,7 +44,7 @@ async function bootstrap() {
   const swagger = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, swagger);
 
-  await app.listen(port);
+  await app.listen(PORT);
 
   app.useGlobalPipes(
     new ValidationPipe({
