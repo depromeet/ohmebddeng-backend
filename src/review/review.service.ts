@@ -32,14 +32,14 @@ export class ReviewService {
 
   async createReview(reviewDetails: CreateReviewDto) {
     try{
-      const { hotLevel, userId, foodId, tagIds } = reviewDetails;
+      const { hotLevel, userId, foodId, tags } = reviewDetails;
       const review = new Review();
       const hotLevelId = produceHotLevelId(hotLevel);
       review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
       review.user = await getRepository(User).findOne(userId);
       review.food = await getRepository(Food).findOne(foodId);
       review.tasteReviews = await Promise.all(
-        tagIds.map(async (tagid) => {
+        tags.map(async (tagid) => {
           const tag = getRepository(TasteTag).findOne(tagid);
           return tag;
         }),
@@ -58,7 +58,7 @@ export class ReviewService {
     try{
       const { userId, reviewList } = reviewsDetails;
 
-      reviewList.map(async ({ foodId, hotLevel, tagIds }) => {
+      reviewList.map(async ({ foodId, hotLevel, tags }) => {
         const review = new Review();
         const hotLevelId = produceHotLevelId(hotLevel);
 
@@ -66,7 +66,7 @@ export class ReviewService {
         review.food = await getRepository(Food).findOne(foodId);
         review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
         review.tasteReviews = await Promise.all(
-          tagIds.map(async (tagid) => {
+          tags.map(async (tagid) => {
             const tag = getRepository(TasteTag).findOne(tagid);
             return tag;
           }),
