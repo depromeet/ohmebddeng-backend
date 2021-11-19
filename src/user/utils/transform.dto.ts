@@ -1,5 +1,4 @@
 import { Food } from '@food/entities/food.entity';
-import { Module } from '@nestjs/common';
 import { TemporaryAnswer } from '@user/dto/create-user-level.dto';
 
 export class TransformDto {
@@ -32,11 +31,3 @@ export class TransformDto {
 
   findUserCount() {}
 }
-
-@Module({
-  imports: [TransformDto],
-  controllers: [],
-  providers: [],
-  exports: [TransformDto],
-})
-export class TransformDtoModule {}

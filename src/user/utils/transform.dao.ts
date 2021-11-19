@@ -1,12 +1,6 @@
 import { ERROR_MESSAGE } from '@common/enums/error-message';
-import { HttpException, HttpStatus, Module } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { User } from '@user/entities/user.entity';
-
-interface IFoodLevel {
-  foodId: string;
-  foodLevelId: string;
-}
-
 export class TransformDao {
   findUser(user: User) {
     try {
@@ -57,11 +51,3 @@ export class TransformDao {
 
   findUserCount() {}
 }
-
-@Module({
-  imports: [TransformDao],
-  controllers: [],
-  providers: [],
-  exports: [TransformDao],
-})
-export class TransformDaoModule {}
