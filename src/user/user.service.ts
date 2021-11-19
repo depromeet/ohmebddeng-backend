@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,6 +20,9 @@ import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
 import { FindUserCountDto } from './dto/find-user-count.dto';
 import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
 import { FindUserDto } from './dto/find-user.dto';
+import { TransformDao } from './utils/transform.dao';
+import { TransformDto } from './utils/transform.dto';
+import { ERROR_MESSAGE } from '@common/enums/error-message';
 @Injectable()
 export class UserService {
   constructor(
@@ -28,6 +31,9 @@ export class UserService {
 
     @InjectRepository(Food)
     private readonly foodRepository: Repository<Food>,
+
+    private readonly transformDao: TransformDao,
+    private readonly transformDto: TransformDto,
   ) {}
 
   async createAnonymousUser(): Promise<FindAnonymousUserDto> {
@@ -45,109 +51,49 @@ export class UserService {
   async findUser(
     userId: string,
   ): Promise<FindUserDto | Omit<FindUserDto, 'userLevel'>> {
-    const query = this.userRepository
+    const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userLevel', 'userLevel')
       .leftJoinAndSelect('userLevel.userLevelDetail', 'userLevelDetail')
       .where('user.id = :userId', { userId })
       .getOne();
 
-    return this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.userLevel', 'userLevel')
-      .leftJoinAndSelect('userLevel.userLevelDetail', 'userLevelDetail')
-      .where('user.id = :userId', { userId })
-      .getOne()
-      .then((user) => {
-        // Return 타입 변경
-        // isDeleted, role을 빼고 보냄
-        const { userLevel, isDeleted, role, ...userRest } = user;
-
-        // 사용자가 레벨테스트를 진행하지 않아 레벨이 없을 경우, userRest return합니다
-        if (!userLevel) {
-          return userRest;
-        }
-
-        const {
-          id,
-          name,
-          imageUrl,
-          summary,
-          description,
-          userLevelDetail,
-          level,
-        } = userLevel;
-        const details = userLevelDetail.map(({ detail }) => detail);
-
-        return {
-          ...userRest,
-          userLevel: {
-            id,
-            name,
-            imageUrl,
-            summary,
-            description,
-            details,
-            level,
-          },
-        };
-      });
+    return this.transformDao.findUser(user);
   }
 
   async updateUserLevel(params: updateUserLevelDto): Promise<FindUserLevelDto> {
     let userLevel = new UserLevel();
 
-    const { userId, answers } = params;
+    let { userId, answers } = params;
 
-    // get each food level
-    const foodIds = answers.map(({ foodId }) => foodId);
-    const foods: IFoodLevel[] = await this.foodRepository
+    // foodId 값이 없는 응답은 걸러냄. 응답이 존재하지 않을 경우 에러 발생시킴
+    const foodIds = answers
+      .filter((answer) => answer.foodId)
+      .map((food) => {
+        if (!food || !food.foodId) {
+          throw new HttpException(
+            ERROR_MESSAGE.BAD_REQUEST,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        return food.foodId;
+      });
+
+    // 각 음식별로 음식레벨을 가져옴
+    const foods = await this.foodRepository
       .createQueryBuilder('food')
       .leftJoin('food.foodLevel', 'foodLevel')
       .select(['food.id', 'foodLevel.id'])
       .where('food.id IN (:...ids)', { ids: foodIds })
-      .getMany()
-      .then((foods) =>
-        foods.map(({ id: foodId, foodLevel }) => ({
-          //foodId, foodLevelId만 뽑아낸다.
-          foodId,
-          foodLevelId: foodLevel.id,
-        })),
-      );
+      .getMany();
 
-    /**
-     * EvaluateLevel에 필요한 형태로 foods와 answers 두 배열을 가공합니다.
-     * foods와 answers 두 배열을 합칩니다. 동일한 foodId를 기준으로 두 배열의 각 요소는 합쳐지게 됩니다. foodId는 제외합니다.
-     * @param foods foodId와 foodLeveLid로 이뤄진 배열
-     * @param answers foodId와 HOT_LEVEL로 이뤄진 배열
-     * @returns foods와 answers를 겹치는 foodId를 기준으로 요소를 합친 배열 { foodLevelId, hotLevelId }
-     */
-    const createEvaluateUserLevelParam = (
-      foods: IFoodLevel[],
-      answers: TemporaryAnswer[],
-    ) => {
-      return foods.map(({ foodId, foodLevelId }) => {
-        // answers에서 food와 foodId가 같은 요소를 탐색
-        const { hotLevel } = answers.find((answer) => answer.foodId === foodId);
-
-        // 응답(answer)에 일치하는 foodId가 있는 경우만 hotLevel과 foodLevelId를 반환되는 배열에 추가
-        return hotLevel && { hotLevel, foodLevelId };
-      });
-    };
-
-    // evaluate User Level
-    /**
-     * foodLevelId, hotLevel로 이루어진 배열을 만듭니다
-     */
-    const evaluateUserLevelParams = createEvaluateUserLevelParam(
-      foods,
-      answers,
-    );
-
-    const evaluateUserLevel = new EvaluateUserLevel(evaluateUserLevelParams);
+    // 사용자의 레벨을 알고리즘에 의해 결정함
+    const evaluateParam = this.transformDto.updateUserLevel(foods, answers);
+    const evaluateUserLevel = new EvaluateUserLevel(evaluateParam);
     userLevel.id = evaluateUserLevel.evaluateLevel().toString();
 
-    // save userLevel in DB
+    // 사용자의 레벨을 DB에 저장함
     this.userRepository
       .createQueryBuilder()
       .update(User)
@@ -155,14 +101,15 @@ export class UserService {
       .where('id = :id', { id: userId })
       .execute();
 
-    // return userLevel
-    return this.userRepository
+    // 저장된 사용자 레벨과 정보를 DB에서 가져옴
+    const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.userLevel', 'userLevel')
       .select(['user.id', 'userLevel'])
       .where('user.id = :id', { id: userId })
-      .getOne()
-      .then(({ id: userId, userLevel }) => ({ userId, userLevel }));
+      .getOne();
+
+    return this.transformDao.updateUserLevel(user);
   }
 
   async findUserCount(param: FindUserCountQueryDto): Promise<FindUserCountDto> {
