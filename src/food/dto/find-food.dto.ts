@@ -21,7 +21,7 @@ export class FindFoodDto {
 
   @IsString()
   @ApiProperty({ description: '음식 로고 이미지', type: String || null })
-  logoImageUrl: string | null;
+  logoImageUrl?: string | null;
 
   @IsEnum(HOT_LEVEL)
   @ApiProperty({ description: '음식의 맵기 레벨', enum: HOT_LEVEL })

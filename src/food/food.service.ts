@@ -122,7 +122,9 @@ export class FoodService {
    * @param param userId?: string, category?: string, size?: string, sort?: SORT, hotLevel?: HOT_LEVEL
    * @returns id, name, subName, imageUrl, logoImageUrl, hotLevel로 이루어진 객체의 배열
    */
-  async findFoods(param: FindFoodsQueryDto): Promise<FindFoodDto[]> {
+  async findFoods(
+    param: FindFoodsQueryDto,
+  ): Promise<Omit<FindFoodDto[], 'logoImageUrl'>> {
     const { category, hotLevel, size: providedSize, sort } = param;
     const size = providedSize ? Number(providedSize) : 10; // default size = 10
 
