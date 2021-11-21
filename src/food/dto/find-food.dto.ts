@@ -47,5 +47,5 @@ export class RandomFoodDto {
 
   @IsString()
   @ApiProperty({ description: '음식 로고 이미지', type: String || null })
-  logoImageUrl: string | null;
+  logoImageUrl?: string | null;
 }
