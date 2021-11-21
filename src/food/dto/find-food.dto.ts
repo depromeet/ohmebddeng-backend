@@ -19,6 +19,10 @@ export class FindFoodDto {
   @ApiProperty({ description: '음식 이미지', type: String || null })
   imageUrl: string | null;
 
+  @IsString()
+  @ApiProperty({ description: '음식 로고 이미지', type: String || null })
+  logoImageUrl?: string | null;
+
   @IsEnum(HOT_LEVEL)
   @ApiProperty({ description: '음식의 맵기 레벨', enum: HOT_LEVEL })
   hotLevel: HOT_LEVEL;
@@ -40,4 +44,8 @@ export class RandomFoodDto {
   @IsString()
   @ApiProperty({ description: '음식 이미지', type: String || null })
   imageUrl: string | null;
+
+  @IsString()
+  @ApiProperty({ description: '음식 로고 이미지', type: String || null })
+  logoImageUrl?: string | null;
 }

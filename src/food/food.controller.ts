@@ -44,7 +44,7 @@ export class FoodController {
     description: '리뷰 할 음식 List을 가져온다.',
   })
   @ApiCreatedResponse({ description: '음식 list', type: Food })
-  async reviewFoodList(): Promise<Food[]> {
+  async reviewFoodList(): Promise<Food> {
     return this.foodService.findReviewFoods();
   }
 
@@ -109,7 +109,13 @@ export class FoodController {
   @ApiParam({ name: '음식 id', type: String })
   @ApiResponse({
     description: '음식 리스트',
-    type: PickType(FindFoodDto, ['id', 'imageUrl', 'name', 'subName']),
+    type: PickType(FindFoodDto, [
+      'id',
+      'imageUrl',
+      'logoImageUrl',
+      'name',
+      'subName',
+    ]),
   })
   async findFoodByFoodId(
     @Param() param: { foodId: string },
