@@ -39,9 +39,9 @@ export class FoodService {
     this.userRepository = userRepository;
   }
 
-  async findReviewFoods(): Promise<Food[]> {
+  async findReviewFoods(): Promise<Food> {
     try {
-      const foods: Food[] = await this.foodRepository
+      const foods: Food = await this.foodRepository
         .createQueryBuilder('food')
         .select([
           'food.id',
@@ -52,8 +52,7 @@ export class FoodService {
         ])
         .where('food.isTest = true')
         .orderBy('RAND()')
-        .limit(3)
-        .getMany();
+        .getOne();
 
       return foods;
     } catch (e) {
