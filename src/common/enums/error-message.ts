@@ -1,6 +1,6 @@
 export enum ERROR_MESSAGE {
-  NOT_FOUND = '찾으시는 정보나 페이지가 존재하지 않아요 ㅠ',
-  INTERNAL_SERVER_ERROR = '서비스에 문제가 생긴 것 같아요ㅠ 빠르게 해결할게요!',
-  BAD_REQUEST = '잘못된 요청입니다. 다시 시도해 주세요!',
-  UNAUTHORIZED = '권한이 없어요. 다시 시도해 주세요!',
+  NOT_FOUND = '없는 페이지를 찾으셨군요.. 박수!',
+  INTERNAL_SERVER_ERROR = '펑! 서버가 터졌어요. 개발자가 빠르게 해결할거에요',
+  BAD_REQUEST = '찾는 정보가 없는 것 같습니다..',
+  UNAUTHORIZED = '레벨테스트가 필요해요!',
 }
