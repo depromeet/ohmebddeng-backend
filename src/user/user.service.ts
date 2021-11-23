@@ -11,11 +11,6 @@ import {
 import { Food } from 'src/food/entities/food.entity';
 import { EvaluateUserLevel } from './utils/evaluate-user-level';
 import { FindUserLevelDto } from './dto/find-user-level.dto';
-
-interface IFoodLevel {
-  foodId: string;
-  foodLevelId: string;
-}
 import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
 import { FindUserCountDto } from './dto/find-user-count.dto';
 import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
