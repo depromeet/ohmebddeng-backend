@@ -21,6 +21,9 @@ class UserLevelDto {
 
   @ApiProperty({ description: 'detail' })
   details: string[];
+
+  @ApiProperty({ description: 'User의 level' })
+  level: number;
 }
 
 export class FindUserResponseDto

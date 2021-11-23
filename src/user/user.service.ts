@@ -43,17 +43,15 @@ export class UserService {
    * @param userId 사용자 id를 param으로 받음
    * @returns 사용자 정보, 사용자 레벨 정보, 사용자의 리뷰 정보
    */
-  async findUser(
-    userId: string,
-  ): Promise<FindUserResponseDto | Omit<FindUserResponseDto, 'userLevel'>> {
-    const user = await this.userRepository
+  async findUser(userId: string): Promise<User> {
+    return this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userLevel', 'userLevel')
       .leftJoinAndSelect('userLevel.userLevelDetail', 'userLevelDetail')
       .where('user.id = :userId', { userId })
       .getOne();
 
-    return this.transformDao.findUser(user);
+    // return this.transformDao.findUser(user);
   }
 
   async updateUserLevel(params: updateUserLevelDto): Promise<FindUserLevelDto> {

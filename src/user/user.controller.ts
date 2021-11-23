@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { FindUserCountDto } from './dto/find-user-count.dto';
 
@@ -17,6 +26,7 @@ import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
 import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
 import { FindUserRequestDto, FindUserResponseDto } from './dto/find-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ERROR_MESSAGE } from '@common/enums/error-message';
 @Controller('user')
 @ApiTags('사용자 API')
 export class UserController {
@@ -44,7 +54,44 @@ export class UserController {
   async findUser(
     @Param() params: FindUserRequestDto,
   ): Promise<FindUserResponseDto | Omit<FindUserResponseDto, 'userLevel'>> {
-    return this.userService.findUser(params.userId);
+    const { userId } = params;
+    const user = await this.userService.findUser(userId);
+
+    try {
+      const { userLevel, isDeleted, role, ...userRest } = user;
+
+      // Level이 없는 경우 일반 user 값만 return
+      if (!userLevel) {
+        return userRest;
+      }
+
+      const {
+        id,
+        name,
+        imageUrl,
+        summary,
+        description,
+        userLevelDetail,
+        level,
+      } = userLevel;
+
+      const details = userLevelDetail.map(({ detail }) => detail);
+
+      return {
+        ...userRest,
+        userLevel: {
+          id,
+          name,
+          imageUrl,
+          summary,
+          description,
+          details,
+          level,
+        },
+      };
+    } catch (e) {
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
   }
 
   // 사용자 레벨 테스트 제출
