@@ -24,12 +24,14 @@ export class UserController {
 
   // 익명 사용자 ID 발급
   @Get('anonymous')
+  @ApiOperation({ summary: '익명 사용자를 생성하는 API' })
   async createAnonymousUser(): Promise<FindAnonymousUserDto> {
     return this.userService.createAnonymousUser();
   }
 
   // 서비스를 사용한 사용자 수 조회
   @Get('count')
+  @ApiOperation({ summary: '총 사용자 수를 조회하는 API' })
   async findUserCount(
     @Query() param: FindUserCountQueryDto,
   ): Promise<FindUserCountDto> {
@@ -38,6 +40,7 @@ export class UserController {
 
   // 익명 사용자 ID 기반 사용자 정보 조회
   @Get(':userId')
+  @ApiOperation({ summary: '특정 사용자의 정보를 가져오는 API' })
   async findUser(
     @Param() params: FindUserRequestDto,
   ): Promise<FindUserResponseDto | Omit<FindUserResponseDto, 'userLevel'>> {
@@ -46,6 +49,7 @@ export class UserController {
 
   // 사용자 레벨 테스트 제출
   @Post('level')
+  @ApiOperation({ summary: '사용자의 Level Test 결과를 생성/업데이트하는 API' })
   async updateUserLevel(
     @Body() params: updateUserLevelDto,
   ): Promise<FindUserLevelDto> {
