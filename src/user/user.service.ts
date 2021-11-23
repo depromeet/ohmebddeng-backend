@@ -28,12 +28,11 @@ export class UserService {
     private readonly transformDto: TransformDto,
   ) {}
 
-  async createAnonymousUser(): Promise<FindAnonymousUserDto> {
+  async createAnonymousUser(): Promise<User> {
     const user = new User();
     user.anonymousId = uuidv4();
 
-    const { anonymousId, id: userId } = await this.userRepository.save(user);
-    return { anonymousId, userId };
+    return this.userRepository.save(user);
   }
 
   /**

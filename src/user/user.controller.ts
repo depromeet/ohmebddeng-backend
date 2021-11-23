@@ -39,7 +39,10 @@ export class UserController {
   @Get('anonymous')
   @ApiOperation({ summary: '익명 사용자를 생성하는 API' })
   async createAnonymousUser(): Promise<FindAnonymousUserDto> {
-    return this.userService.createAnonymousUser();
+    const { anonymousId, id: userId } =
+      await this.userService.createAnonymousUser();
+
+    return { anonymousId, userId };
   }
 
   /**
