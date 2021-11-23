@@ -10,7 +10,7 @@ import { User } from '@user/entities/user.entity';
 import { produceHotLevelId } from '@review/utils/produce-hot-level';
 
 import { CreateFoodDto } from '@food/dto/create-food.dto';
-import { FindFoodDto, RandomFoodDto } from '@food/dto/find-food.dto';
+import { FindFoodDto } from '@food/dto/find-food.dto';
 import { FindFoodsQueryDto } from '@food/dto/find-foods-query.dto';
 import { Category } from '@food/entities/category.entity';
 import { Food } from '@food/entities/food.entity';
@@ -56,24 +56,20 @@ export class FoodService {
   }
 
   async findTestFoods(): Promise<Food[]> {
-    try {
-      const foods: Food[] = await this.foodRepository
-        .createQueryBuilder('food')
-        .select([
-          'food.id',
-          'food.name',
-          'food.subName',
-          'food.imageUrl',
-          'food.logoImageUrl',
-        ])
-        .where('food.isTest = true')
-        .orderBy('RAND()')
-        .getMany();
+    const foods: Food[] = await this.foodRepository
+      .createQueryBuilder('food')
+      .select([
+        'food.id',
+        'food.name',
+        'food.subName',
+        'food.imageUrl',
+        'food.logoImageUrl',
+      ])
+      .where('food.isTest = true')
+      .orderBy('RAND()')
+      .getMany();
 
-      return foods;
-    } catch (e) {
-      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
-    }
+    return foods;
   }
 
   async findFoodLevelByLevelId(level): Promise<FoodLevel> {
@@ -134,9 +130,6 @@ export class FoodService {
       level,
       category,
     };
-  }
-  catch(e) {
-    throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
   }
 
   async findFoods(
