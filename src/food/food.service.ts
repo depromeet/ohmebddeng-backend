@@ -37,20 +37,33 @@ export class FoodService {
     this.userRepository = userRepository;
   }
 
-  async findReviewFoods(): Promise<Food[]> {
-    return await this.foodRepository
+  async findReviewFoods(): Promise<Food> {
+    const foods: Food = await this.foodRepository
       .createQueryBuilder('food')
-      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+      .select([
+        'food.id',
+        'food.name',
+        'food.subName',
+        'food.imageUrl',
+        'food.logoImageUrl',
+      ])
       .where('food.isTest = true')
       .orderBy('RAND()')
-      .limit(3)
-      .getMany();
+      .getOne();
+
+    return foods;
   }
 
   async findTestFoods(): Promise<Food[]> {
     return await this.foodRepository
       .createQueryBuilder('food')
-      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+      .select([
+        'food.id',
+        'food.name',
+        'food.subName',
+        'food.imageUrl',
+        'food.logoImageUrl',
+      ])
       .where('food.isTest = true')
       .orderBy('RAND()')
       .getMany();
@@ -111,9 +124,11 @@ export class FoodService {
    * 경우에 따라서 user의 맵레벨과 상관없이 특정 카테고리의 모든 음식만 가져오는 API가 필요할 수도 있고,
    * 전체 음식 리스트를 가져오고 싶은 경우도 있을 수 있기 때문입니다.
    * @param param userId?: string, category?: string, size?: string, sort?: SORT, hotLevel?: HOT_LEVEL
-   * @returns id, name, subName, imageUrl, hotLevel로 이루어진 객체의 배열
+   * @returns id, name, subName, imageUrl, logoImageUrl, hotLevel로 이루어진 객체의 배열
    */
-  async findFoods(param: FindFoodsQueryDto): Promise<FindFoodDto[]> {
+  async findFoods(
+    param: FindFoodsQueryDto,
+  ): Promise<Omit<FindFoodDto[], 'logoImageUrl'>> {
     const { category, hotLevel, size: providedSize, sort } = param;
     const size = providedSize ? Number(providedSize) : 10; // default size = 10
 
@@ -177,7 +192,13 @@ export class FoodService {
     return await this.foodRepository
       .createQueryBuilder('food')
       .leftJoinAndSelect('food.foodLevel', 'foodLevel')
-      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+      .select([
+        'food.id',
+        'food.name',
+        'food.subName',
+        'food.imageUrl',
+        'food.logoImageUrl',
+      ])
       .where('food.foodLevel = :foodLevel', { foodLevel })
       .orderBy('RAND()')
       .limit(3)
@@ -199,7 +220,13 @@ export class FoodService {
     return await this.foodRepository
       .createQueryBuilder('food')
       .leftJoinAndSelect('food.foodLevel', 'foodLevel')
-      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+      .select([
+        'food.id',
+        'food.name',
+        'food.subName',
+        'food.imageUrl',
+        'food.logoImageUrl',
+      ])
       .where('food.foodLevel = :foodLevel', { foodLevel: userlevel.id })
       .orderBy('RAND()')
       .getOne();
@@ -210,14 +237,21 @@ export class FoodService {
   ): Promise<Omit<FindFoodDto, 'hotLevel'>> {
     return this.foodRepository
       .createQueryBuilder('food')
-      .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
+      .select([
+        'food.id',
+        'food.name',
+        'food.subName',
+        'food.imageUrl',
+        'food.logoImageUrl',
+      ])
       .where('food.id = :foodId', { foodId })
       .getOne()
-      .then(({ id, name, subName, imageUrl }) => ({
+      .then(({ id, name, subName, imageUrl, logoImageUrl }) => ({
         id,
         name,
         subName,
         imageUrl,
+        logoImageUrl,
       }));
   }
 }

@@ -1,4 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { IsNumberString } from 'class-validator';
 import { Review } from 'src/review/entities/review.entity';
 import { User } from '../entities/user.entity';
 
@@ -22,7 +23,7 @@ class UserLevelDto {
   details: string[];
 }
 
-export class FindUserDto
+export class FindUserResponseDto
   implements Omit<User, 'userLevel' | 'isDeleted' | 'role'>
 {
   @ApiProperty({ description: 'id' })
@@ -72,4 +73,10 @@ export class FindUserDto
 
   @ApiProperty({ description: 'reviews' })
   reviews: Review[];
+}
+
+export class FindUserRequestDto {
+  @ApiProperty({ description: '사용자 id. 숫자로된 string' })
+  @IsNumberString()
+  userId: string;
 }

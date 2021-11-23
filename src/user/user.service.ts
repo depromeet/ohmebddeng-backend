@@ -19,10 +19,10 @@ interface IFoodLevel {
 import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
 import { FindUserCountDto } from './dto/find-user-count.dto';
 import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
-import { FindUserDto } from './dto/find-user.dto';
 import { TransformDao } from './utils/transform.dao';
 import { TransformDto } from './utils/transform.dto';
 import { ERROR_MESSAGE } from '@common/enums/error-message';
+import { FindUserResponseDto } from './dto/find-user.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -50,7 +50,7 @@ export class UserService {
    */
   async findUser(
     userId: string,
-  ): Promise<FindUserDto | Omit<FindUserDto, 'userLevel'>> {
+  ): Promise<FindUserResponseDto | Omit<FindUserResponseDto, 'userLevel'>> {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userLevel', 'userLevel')

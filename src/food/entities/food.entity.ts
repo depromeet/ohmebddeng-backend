@@ -65,6 +65,14 @@ export class Food {
   @ApiProperty({ description: '음식 사진 URL', type: String, nullable: true })
   imageUrl: string;
 
+  @Column({ nullable: true })
+  @ApiProperty({
+    description: '음식 로고 사진 URL',
+    type: String,
+    nullable: true,
+  })
+  logoImageUrl: string;
+
   // 하나의 음식이 여러 카테고리, [ex) 떡볶이 => 한식, 분식]에 속할 수 있다고 가정
   @ManyToMany(() => Category, { nullable: false })
   @JoinTable({ name: 'food_category' })
