@@ -39,10 +39,17 @@ export class UserController {
   @Get('anonymous')
   @ApiOperation({ summary: '익명 사용자를 생성하는 API' })
   async createAnonymousUser(): Promise<FindAnonymousUserDto> {
-    const { anonymousId, id: userId } =
-      await this.userService.createAnonymousUser();
+    try {
+      const { anonymousId, id: userId } =
+        await this.userService.createAnonymousUser();
 
-    return { anonymousId, userId };
+      return { anonymousId, userId };
+    } catch (e) {
+      throw new HttpException(
+        ERROR_MESSAGE.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   /**
@@ -55,11 +62,19 @@ export class UserController {
   async findUserCount(
     @Query() params: FindUserCountQueryDto,
   ): Promise<FindUserCountDto> {
-    // levelTestedOnly는 query param이라 string으로만 받아짐.
-    const levelTestedOnly = params.levelTestedOnly === 'true';
-    const count = await this.userService.findUserCount(levelTestedOnly);
+    try {
+      // levelTestedOnly는 query param이라 string으로만 받아짐.
+      const levelTestedOnly = params.levelTestedOnly === 'true';
 
-    return { count, levelTestedOnly };
+      const count = await this.userService.findUserCount(levelTestedOnly);
+
+      return { count, levelTestedOnly };
+    } catch (e) {
+      throw new HttpException(
+        ERROR_MESSAGE.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   /**
@@ -73,10 +88,10 @@ export class UserController {
     @Param() params: FindUserRequestDto,
   ): Promise<FindUserResponseDto | Omit<FindUserResponseDto, 'userLevel'>> {
     const { userId } = params;
-    const user = await this.userService.findUser(userId);
 
     try {
-      const { userLevel, isDeleted, role, ...userRest } = user;
+      const { userLevel, isDeleted, role, ...userRest } =
+        await this.userService.findUser(userId);
 
       // Level이 없는 경우 일반 user 값만 return
       if (!userLevel) {
@@ -121,7 +136,7 @@ export class UserController {
   async updateUserLevel(
     @Body() params: updateUserLevelDto,
   ): Promise<FindUserLevelDto> {
-    let { userId, answers } = params;
+    const { userId, answers } = params;
 
     // foodId 값이 없는 응답은 걸러냄. 응답이 존재하지 않을 경우 에러 발생시킴
     const foodIds = answers
@@ -137,16 +152,14 @@ export class UserController {
         return food.foodId;
       });
 
-    const user = await this.userService.updateUserLevel(
-      userId,
-      answers,
-      foodIds,
-    );
-
     try {
-      const { id: userId, userLevel } = user;
+      const { id, userLevel } = await this.userService.updateUserLevel(
+        userId,
+        answers,
+        foodIds,
+      );
 
-      return { userId, userLevel };
+      return { userId: id, userLevel };
     } catch (e) {
       throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
     }
