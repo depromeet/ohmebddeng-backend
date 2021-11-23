@@ -1,7 +1,9 @@
 import { Repository } from 'typeorm';
 
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+
+import { ERROR_MESSAGE } from '@common/enums/error-message';
 
 import { User } from '@user/entities/user.entity';
 
@@ -54,18 +56,24 @@ export class FoodService {
   }
 
   async findTestFoods(): Promise<Food[]> {
-    return await this.foodRepository
-      .createQueryBuilder('food')
-      .select([
-        'food.id',
-        'food.name',
-        'food.subName',
-        'food.imageUrl',
-        'food.logoImageUrl',
-      ])
-      .where('food.isTest = true')
-      .orderBy('RAND()')
-      .getMany();
+    try {
+      const foods: Food[] = await this.foodRepository
+        .createQueryBuilder('food')
+        .select([
+          'food.id',
+          'food.name',
+          'food.subName',
+          'food.imageUrl',
+          'food.logoImageUrl',
+        ])
+        .where('food.isTest = true')
+        .orderBy('RAND()')
+        .getMany();
+
+      return foods;
+    } catch (e) {
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
+    }
   }
 
   async findFoodLevelByLevelId(level): Promise<FoodLevel> {
@@ -127,18 +135,34 @@ export class FoodService {
       category,
     };
   }
+  catch(e) {
+    throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
+  }
 
   async findFoods(
     param: FindFoodsQueryDto,
   ): Promise<Omit<FindFoodDto[], 'logoImageUrl'>> {
-    const { category, hotLevel, size: providedSize, sort } = param;
-    const size = providedSize ? Number(providedSize) : 10; // default size = 10
+    try {
+      const { category, hotLevel, size: providedSize, sort } = param;
+      const size = providedSize ? Number(providedSize) : 10; // default size = 10
 
-    // hotLevel 없이 요청이 온 경우
-    if (!hotLevel) {
-      // hotLevel 없고, category도 없는 경우
-      if (!category) {
-        const query = this.foodRepository.createQueryBuilder('food');
+      // hotLevel 없이 요청이 온 경우
+      if (!hotLevel) {
+        // hotLevel 없고, category도 없는 경우
+        if (!category) {
+          const query = this.foodRepository.createQueryBuilder('food');
+
+          return sortBy(query, sort)
+            .take(size)
+            .getMany()
+            .then(produceFindFoodDto);
+        }
+
+        // hotLevel만 없는 경우
+        const query = this.foodRepository
+          .createQueryBuilder('food')
+          .leftJoinAndSelect('food.categories', 'category')
+          .where('category.name = :categoryName', { categoryName: category });
 
         return sortBy(query, sort)
           .take(size)
@@ -146,35 +170,32 @@ export class FoodService {
           .then(produceFindFoodDto);
       }
 
-      // hotLevel만 없는 경우
+      // hotLevel이 있는 경우
+      const hotLevelId = produceHotLevelId(hotLevel);
+
+      // hotLevel은 있지만 category가 없는 경우
+      if (!category) {
+        const query = this.foodRepository
+          .createQueryBuilder('food')
+          .leftJoinAndSelect('food.foodLevel', 'foodLevel')
+          .where('foodLevel.id = :hotLevelId', { hotLevelId });
+
+        return sortBy(query, sort)
+          .take(size)
+          .getMany()
+          .then(produceFindFoodDto);
+      }
       const query = this.foodRepository
         .createQueryBuilder('food')
         .leftJoinAndSelect('food.categories', 'category')
-        .where('category.name = :categoryName', { categoryName: category });
-
-      return sortBy(query, sort).take(size).getMany().then(produceFindFoodDto);
-    }
-
-    // hotLevel이 있는 경우
-    const hotLevelId = produceHotLevelId(hotLevel);
-
-    // hotLevel은 있지만 category가 없는 경우
-    if (!category) {
-      const query = this.foodRepository
-        .createQueryBuilder('food')
         .leftJoinAndSelect('food.foodLevel', 'foodLevel')
-        .where('foodLevel.id = :hotLevelId', { hotLevelId });
+        .where('category.name = :categoryName', { categoryName: category })
+        .andWhere('foodLevel.id = :hotLevelId', { hotLevelId });
 
       return sortBy(query, sort).take(size).getMany().then(produceFindFoodDto);
+    } catch (e) {
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
-    const query = this.foodRepository
-      .createQueryBuilder('food')
-      .leftJoinAndSelect('food.categories', 'category')
-      .leftJoinAndSelect('food.foodLevel', 'foodLevel')
-      .where('category.name = :categoryName', { categoryName: category })
-      .andWhere('foodLevel.id = :hotLevelId', { hotLevelId });
-
-    return sortBy(query, sort).take(size).getMany().then(produceFindFoodDto);
   }
 
   // 레벨 별 음식 정보를 가져 옵니다.
