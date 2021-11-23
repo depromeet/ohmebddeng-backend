@@ -1,20 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserLevel } from './entities/user_level.entity';
-import { updateUserLevelDto, Answer } from './dto/create-user-level.dto';
 import { Food } from 'src/food/entities/food.entity';
 import { EvaluateUserLevel } from './utils/evaluate-user-level';
-import { FindUserLevelDto } from './dto/find-user-level.dto';
-import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
-import { FindUserCountDto } from './dto/find-user-count.dto';
-import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
-import { TransformDao } from './utils/transform.dao';
-import { TransformDto } from './utils/transform.dto';
-import { ERROR_MESSAGE } from '@common/enums/error-message';
-import { FindUserResponseDto } from './dto/find-user.dto';
+import { Answer } from './dto/create-user-level.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -24,10 +16,13 @@ export class UserService {
     @InjectRepository(Food)
     private readonly foodRepository: Repository<Food>,
 
-    private readonly transformDao: TransformDao,
-    private readonly transformDto: TransformDto,
+    private readonly evaluateUserLevel: EvaluateUserLevel,
   ) {}
 
+  /**
+   * 익명 사용자 생성 API
+   * @returns 생성된 사용자의 userId, anonymousId
+   */
   async createAnonymousUser(): Promise<User> {
     const user = new User();
     user.anonymousId = uuidv4();
@@ -49,24 +44,19 @@ export class UserService {
       .getOne();
   }
 
-  async updateUserLevel(params: updateUserLevelDto): Promise<FindUserLevelDto> {
+  /**
+   * 사용자의 레벨을 결정합니다(create/update)
+   * @param userId 사용자 ID
+   * @param answers {음식 ID, 맵레벨평가}
+   * @param foodIds 평가한 음식 ID로 이루어진 배열
+   * @returns 사용자의 레벨을 포함한 사용자 정보
+   */
+  async updateUserLevel(
+    userId: string,
+    answers: Answer[],
+    foodIds: string[],
+  ): Promise<User> {
     let userLevel = new UserLevel();
-
-    let { userId, answers } = params;
-
-    // foodId 값이 없는 응답은 걸러냄. 응답이 존재하지 않을 경우 에러 발생시킴
-    const foodIds = answers
-      .filter((answer) => answer.foodId)
-      .map((food) => {
-        if (!food || !food.foodId) {
-          throw new HttpException(
-            ERROR_MESSAGE.BAD_REQUEST,
-            HttpStatus.BAD_REQUEST,
-          );
-        }
-
-        return food.foodId;
-      });
 
     // 각 음식별로 음식레벨을 가져옴
     const foods = await this.foodRepository
@@ -77,12 +67,12 @@ export class UserService {
       .getMany();
 
     // 사용자의 레벨을 알고리즘에 의해 결정함
-    const evaluateParam = this.transformDto.updateUserLevel(foods, answers);
-    const evaluateUserLevel = new EvaluateUserLevel(evaluateParam);
-    userLevel.id = evaluateUserLevel.evaluateLevel().toString();
+    userLevel.id = this.evaluateUserLevel
+      .evaluateLevel(foods, answers)
+      .toString();
 
     // 사용자의 레벨을 DB에 저장함
-    this.userRepository
+    await this.userRepository
       .createQueryBuilder()
       .update(User)
       .set({ userLevel })
@@ -90,14 +80,12 @@ export class UserService {
       .execute();
 
     // 저장된 사용자 레벨과 정보를 DB에서 가져옴
-    const user = await this.userRepository
+    return this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.userLevel', 'userLevel')
       .select(['user.id', 'userLevel'])
       .where('user.id = :id', { id: userId })
       .getOne();
-
-    return this.transformDao.updateUserLevel(user);
   }
 
   /**

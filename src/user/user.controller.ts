@@ -121,6 +121,34 @@ export class UserController {
   async updateUserLevel(
     @Body() params: updateUserLevelDto,
   ): Promise<FindUserLevelDto> {
-    return this.userService.updateUserLevel(params);
+    let { userId, answers } = params;
+
+    // foodId 값이 없는 응답은 걸러냄. 응답이 존재하지 않을 경우 에러 발생시킴
+    const foodIds = answers
+      .filter((answer) => answer.foodId)
+      .map((food) => {
+        if (!food || !food.foodId) {
+          throw new HttpException(
+            ERROR_MESSAGE.BAD_REQUEST,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        return food.foodId;
+      });
+
+    const user = await this.userService.updateUserLevel(
+      userId,
+      answers,
+      foodIds,
+    );
+
+    try {
+      const { id: userId, userLevel } = user;
+
+      return { userId, userLevel };
+    } catch (e) {
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
   }
 }

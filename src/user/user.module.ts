@@ -5,12 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { UserRefreshToken } from './entities/user_refresh_token.entity';
 import { Food } from 'src/food/entities/food.entity';
-import { TransformDto } from './utils/transform.dto';
-import { TransformDao } from './utils/transform.dao';
+import { EvaluateUserLevel } from './utils/evaluate-user-level';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, UserRefreshToken, Food])],
   controllers: [UserController],
-  providers: [UserService, TransformDao, TransformDto],
+  providers: [UserService, EvaluateUserLevel],
 })
 export class UserModule {}
