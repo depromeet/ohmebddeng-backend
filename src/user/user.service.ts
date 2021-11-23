@@ -4,10 +4,7 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserLevel } from './entities/user_level.entity';
-import {
-  updateUserLevelDto,
-  TemporaryAnswer,
-} from './dto/create-user-level.dto';
+import { updateUserLevelDto, Answer } from './dto/create-user-level.dto';
 import { Food } from 'src/food/entities/food.entity';
 import { EvaluateUserLevel } from './utils/evaluate-user-level';
 import { FindUserLevelDto } from './dto/find-user-level.dto';
