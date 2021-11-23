@@ -32,14 +32,21 @@ import { ERROR_MESSAGE } from '@common/enums/error-message';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // 익명 사용자 ID 발급
+  /**
+   * 익명 사용자 ID 발급
+   * @returns userId, anonymousId
+   */
   @Get('anonymous')
   @ApiOperation({ summary: '익명 사용자를 생성하는 API' })
   async createAnonymousUser(): Promise<FindAnonymousUserDto> {
     return this.userService.createAnonymousUser();
   }
 
-  // 서비스를 사용한 사용자 수 조회
+  /**
+   * 서비스를 사용한 사용자 수 조회
+   * @param params levelTestedOnly 레벨테스트를 한 사용자만 count할지 여부(boolean)
+   * @returns 사용자수 (number)
+   */
   @Get('count')
   @ApiOperation({ summary: '총 사용자 수를 조회하는 API' })
   async findUserCount(
@@ -52,7 +59,11 @@ export class UserController {
     return { count, levelTestedOnly };
   }
 
-  // 익명 사용자 ID 기반 사용자 정보 조회
+  /**
+   * 익명 사용자 ID 기반 사용자 정보 조회
+   * @param params userId 사용자 ID
+   * @returns 사용자 정보
+   */
   @Get(':userId')
   @ApiOperation({ summary: '특정 사용자의 정보를 가져오는 API' })
   async findUser(
@@ -78,7 +89,6 @@ export class UserController {
         userLevelDetail,
         level,
       } = userLevel;
-
       const details = userLevelDetail.map(({ detail }) => detail);
 
       return {
@@ -98,7 +108,11 @@ export class UserController {
     }
   }
 
-  // 사용자 레벨 테스트 제출
+  /**
+   * 사용자 레벨 테스트 제출
+   * @param params userId, answers
+   * @returns 레벨테스트 결과를 포함한 사용자 정보
+   */
   @Post('level')
   @ApiOperation({ summary: '사용자의 Level Test 결과를 생성/업데이트하는 API' })
   async updateUserLevel(

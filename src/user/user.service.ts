@@ -38,6 +38,7 @@ export class UserService {
     const { anonymousId, id: userId } = await this.userRepository.save(user);
     return { anonymousId, userId };
   }
+
   /**
    * 사용자 id를 기반으로 해당 사용자의 정보를 가져오는 API
    * @param userId 사용자 id를 param으로 받음
@@ -50,8 +51,6 @@ export class UserService {
       .leftJoinAndSelect('userLevel.userLevelDetail', 'userLevelDetail')
       .where('user.id = :userId', { userId })
       .getOne();
-
-    // return this.transformDao.findUser(user);
   }
 
   async updateUserLevel(params: updateUserLevelDto): Promise<FindUserLevelDto> {
@@ -105,6 +104,11 @@ export class UserService {
     return this.transformDao.updateUserLevel(user);
   }
 
+  /**
+   * 총 사용자 수/레벨테스트를 한 총 사용자 수를 가져오는 API
+   * @param levelTestedOnly boolean. 레벨테스트를 한 사용자만 가져오고 싶은 경우.
+   * @returns 사용자 수(number)
+   */
   async findUserCount(levelTestedOnly: boolean): Promise<number> {
     const query = this.userRepository.createQueryBuilder('user');
     if (levelTestedOnly) {

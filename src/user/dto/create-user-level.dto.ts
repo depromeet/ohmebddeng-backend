@@ -2,7 +2,7 @@ import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsString } from 'class-validator';
 import { HOT_LEVEL } from 'src/common/enums/hot-level';
 import { UserLevel } from '../entities/user_level.entity';
-// import { IReview } from 'src/review/dto/create-reviews.dto';
+import { ReviewDto } from 'src/review/dto/create-reviews.dto';
 
 /**
  * 아래 interface는 임시로 사용합니다. 혜연님 담당부분인 IReview가 수정되면 IReview를 사용할 예정입니다.
@@ -33,5 +33,6 @@ export class updateUserLevelDto {
     description: '사용자 레벨테스트 응답',
     type: [TemporaryAnswer],
   })
-  answers: TemporaryAnswer[];
+  answers: Pick<ReviewDto, 'foodId' | 'hotLevel'>[];
+  // answers: TemporaryAnswer[];
 }
