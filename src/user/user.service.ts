@@ -105,28 +105,15 @@ export class UserService {
     return this.transformDao.updateUserLevel(user);
   }
 
-  async findUserCount(param: FindUserCountQueryDto): Promise<FindUserCountDto> {
-    // query param이라 string으로만 받아짐.
-    const levelTestedOnly = param.levelTestedOnly === 'true';
-
+  async findUserCount(levelTestedOnly: boolean): Promise<number> {
+    const query = this.userRepository.createQueryBuilder('user');
     if (levelTestedOnly) {
-      return this.userRepository
-        .createQueryBuilder('user')
+      return query
         .leftJoinAndSelect('user.userLevel', 'userLevel')
         .where('userLevel.id IS NOT NULL')
-        .getCount()
-        .then((count) => ({
-          count,
-          levelTestedOnly,
-        }));
+        .getCount();
     }
 
-    return this.userRepository
-      .createQueryBuilder('user')
-      .getCount()
-      .then((count) => ({
-        count,
-        levelTestedOnly,
-      }));
+    return query.getCount();
   }
 }

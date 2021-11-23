@@ -43,9 +43,13 @@ export class UserController {
   @Get('count')
   @ApiOperation({ summary: '총 사용자 수를 조회하는 API' })
   async findUserCount(
-    @Query() param: FindUserCountQueryDto,
+    @Query() params: FindUserCountQueryDto,
   ): Promise<FindUserCountDto> {
-    return this.userService.findUserCount(param);
+    // levelTestedOnly는 query param이라 string으로만 받아짐.
+    const levelTestedOnly = params.levelTestedOnly === 'true';
+    const count = await this.userService.findUserCount(levelTestedOnly);
+
+    return { count, levelTestedOnly };
   }
 
   // 익명 사용자 ID 기반 사용자 정보 조회
