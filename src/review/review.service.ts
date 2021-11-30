@@ -31,116 +31,100 @@ export class ReviewService {
   ) {}
 
   async createReview(reviewDetails: CreateReviewDto) {
-    try{
-      const { hotLevel, userId, foodId, tags } = reviewDetails;
+    const { hotLevel, userId, foodId, tags } = reviewDetails;
+    const review = new Review();
+    const hotLevelId = produceHotLevelId(hotLevel);
+    review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
+    review.user = await getRepository(User).findOne(userId);
+    review.food = await getRepository(Food).findOne(foodId);
+    review.tasteReviews = await Promise.all(
+      tags.map(async (tagid) => {
+        const tag = getRepository(TasteTag).findOne(tagid);
+        return tag;
+      }),
+    );
+    const result = await this.reviewRepository.save(review);
+    return {
+      userId: result.user.id,
+      foodId: result.food.id,
+    };
+  }
+
+  async createReviews(reviewsDetails: CreateReviewsDto) {
+    const { userId, reviewList } = reviewsDetails;
+
+    reviewList.map(async ({ foodId, hotLevel, tags }) => {
       const review = new Review();
       const hotLevelId = produceHotLevelId(hotLevel);
-      review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
+
       review.user = await getRepository(User).findOne(userId);
       review.food = await getRepository(Food).findOne(foodId);
+      review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
       review.tasteReviews = await Promise.all(
         tags.map(async (tagid) => {
           const tag = getRepository(TasteTag).findOne(tagid);
           return tag;
         }),
       );
-      const result = await this.reviewRepository.save(review);
-      return {
-        userId: result.user.id,
-        foodId: result.food.id,
-      };
-    } catch (e) {
-      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
-    }
-  }
+      return this.reviewRepository.save(review);
+    });
 
-  async createReviews(reviewsDetails: CreateReviewsDto) {
-    try{
-      const { userId, reviewList } = reviewsDetails;
-
-      reviewList.map(async ({ foodId, hotLevel, tags }) => {
-        const review = new Review();
-        const hotLevelId = produceHotLevelId(hotLevel);
-
-        review.user = await getRepository(User).findOne(userId);
-        review.food = await getRepository(Food).findOne(foodId);
-        review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
-        review.tasteReviews = await Promise.all(
-          tags.map(async (tagid) => {
-            const tag = getRepository(TasteTag).findOne(tagid);
-            return tag;
-          }),
-        );
-        return this.reviewRepository.save(review);
-      });
-
-      return {
-        userId: userId,
-        reviewLength: reviewList.length,
-      };
-    } catch (e) {
-      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
-    }
+    return {
+      userId: userId,
+      reviewLength: reviewList.length,
+    };
   }
 
   async findReviewByfoodId(foodId: string) {
-    try{
-      return this.reviewRepository
-        .createQueryBuilder('review')
-        .leftJoin('review.food', 'food')
-        .leftJoin('review.user', 'user')
-        .leftJoin('review.hotLevel', 'hotLevel')
-        .leftJoin('review.tasteReviews', 'review_taste_tag')
-        .select([
-          'review',
-          'food.id',
-          'food.name',
-          'user.id',
-          'hotLevel',
-          'review_taste_tag.id',
-          'review_taste_tag.name',
-        ])
-        .where('review.foodId = :foodId', { foodId })
-        .getMany()
-        .then((reviews) =>
-          reviews.map((review) => {
-            const hotLevel = produceHotLevelString(review.hotLevel.id);
-            return { ...review, hotLevel };
-          }),
-        );
-    } catch (e) {
-      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
-    }
+    return this.reviewRepository
+      .createQueryBuilder('review')
+      .leftJoin('review.food', 'food')
+      .leftJoin('review.user', 'user')
+      .leftJoin('review.hotLevel', 'hotLevel')
+      .leftJoin('review.tasteReviews', 'review_taste_tag')
+      .select([
+        'review',
+        'food.id',
+        'food.name',
+        'user.id',
+        'hotLevel',
+        'review_taste_tag.id',
+        'review_taste_tag.name',
+      ])
+      .where('review.foodId = :foodId', { foodId })
+      .getMany()
+      .then((reviews) =>
+        reviews.map((review) => {
+          const hotLevel = produceHotLevelString(review.hotLevel.id);
+          return { ...review, hotLevel };
+        }),
+      );
   }
 
   async findReviewsByUserId(userId: string) {
-    try{
-      return this.reviewRepository
-        .createQueryBuilder('review')
-        .leftJoinAndSelect('review.food', 'food')
-        .leftJoinAndSelect('review.user', 'user')
-        .leftJoinAndSelect('review.hotLevel', 'hotLevel')
-        .leftJoinAndSelect('review.tasteReviews', 'review_taste_tag')
-        .select([
-          'review',
-          'food.id',
-          'food.name',
-          'user.id',
-          'hotLevel',
-          'review_taste_tag.id',
-          'review_taste_tag.name',
-        ])
-        .where('review.userId = :userId', { userId })
-        .getMany()
-        .then((reviews) =>
-          reviews.map((review) => {
-            const hotLevel = produceHotLevelString(review.hotLevel.id);
-            return { ...review, hotLevel };
-          }),
-        );
-      } catch (e) {
-        throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
-      }
+    return this.reviewRepository
+      .createQueryBuilder('review')
+      .leftJoinAndSelect('review.food', 'food')
+      .leftJoinAndSelect('review.user', 'user')
+      .leftJoinAndSelect('review.hotLevel', 'hotLevel')
+      .leftJoinAndSelect('review.tasteReviews', 'review_taste_tag')
+      .select([
+        'review',
+        'food.id',
+        'food.name',
+        'user.id',
+        'hotLevel',
+        'review_taste_tag.id',
+        'review_taste_tag.name',
+      ])
+      .where('review.userId = :userId', { userId })
+      .getMany()
+      .then((reviews) =>
+        reviews.map((review) => {
+          const hotLevel = produceHotLevelString(review.hotLevel.id);
+          return { ...review, hotLevel };
+        }),
+      );
   }
 
   async findReviewCountByFood(
