@@ -9,19 +9,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Repository, getRepository, In } from 'typeorm';
 import {
-  produceHotLevelId,
-  produceHotLevelString,
-} from './utils/produce-hot-level';
-import {
   FindReviewCountDto,
   HotLevelCountType,
   TasteTagCountType,
 } from './dto/find-review-count.dto';
-import { produceTasteTagString, produceTasteTagId } from './utils/produceTasteTag';
 import { HOT_LEVEL } from 'src/common/enums/hot-level';
 import { TASTE_TAG } from 'src/common/enums/taste-tag';
 import { ERROR_MESSAGE } from 'src/common/enums/error-message';
 import e from 'express';
+import { produceTasteTagString, produceTasteTagId } from './utils/produceTasteTag';
+import { produceHotLevelId, produceHotLevelString} from './utils/produce-hot-level';
+
 
 @Injectable()
 export class ReviewService {
@@ -29,24 +27,18 @@ export class ReviewService {
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
   ) {}
-
   async createReview(
-    userId: string,
-    foodId: string,
-    tags: TASTE_TAG[],
-    hotLevel: HOT_LEVEL
+    user: User,
+    food: Food,
+    tags: TasteTag[],
+    hotLevel: FoodLevel
   ) {
     const review = new Review();
-    const hotLevelId = produceHotLevelId(hotLevel);
-    review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
-    review.user = await getRepository(User).findOne(userId);
-    review.food = await getRepository(Food).findOne(foodId);
-    review.tasteReviews = await Promise.all(
-      tags.map(async (tagid) => {
-        const tag = getRepository(TasteTag).findOne(tagid);
-        return tag;
-      }),
-    );
+    review.hotLevel = hotLevel
+    review.food = food
+    review.user = user
+    review.hotLevel = hotLevel
+    review.tasteReviews = tags
     const result = await this.reviewRepository.save(review);
     return {
       userId: result.user.id,
@@ -64,12 +56,9 @@ export class ReviewService {
       review.user = await getRepository(User).findOne(userId);
       review.food = await getRepository(Food).findOne(foodId);
       review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
-      review.tasteReviews = await Promise.all(
-        tags.map(async (tagid) => {
-          const tag = getRepository(TasteTag).findOne(tagid);
-          return tag;
-        }),
-      );
+    review.tasteReviews = await getRepository(TasteTag).find({
+       name: In(tags),
+     });
       return this.reviewRepository.save(review);
     });
 
