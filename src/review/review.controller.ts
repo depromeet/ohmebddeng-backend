@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { Review } from './entities/review.entity';
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -17,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { HOT_LEVEL } from 'src/common/enums/hot-level';
 import { FindReviewCountDto } from './dto/find-review-count.dto';
+import { ERROR_MESSAGE } from '@common/enums/error-message';
 
 @Controller('review')
 @ApiTags('리뷰 API')
@@ -26,9 +27,23 @@ export class ReviewController {
   @Post('food')
   @ApiOperation({summary: '하나의 리뷰를 제출하는 API'})
   async createReview(
-    @Body() createReviewDto: CreateReviewDto,
+    @Body() params: CreateReviewDto,
   ): Promise<CreateReviewResultDto> {
-    return this.reviewService.createReview(createReviewDto);
+    const { hotLevel, userId, foodId, tags } = params
+    if(!hotLevel || !userId || !foodId || !tags){
+      throw new HttpException(
+        ERROR_MESSAGE.BAD_REQUEST,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    try{
+    return this.reviewService.createReview(hotLevel, userId, foodId, tags);
+    } catch(e) {
+      throw new HttpException(
+        ERROR_MESSAGE.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      )
+    }
   }
 
   @Post('foods')

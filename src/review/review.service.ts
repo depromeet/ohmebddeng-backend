@@ -30,8 +30,12 @@ export class ReviewService {
     private reviewRepository: Repository<Review>,
   ) {}
 
-  async createReview(reviewDetails: CreateReviewDto) {
-    const { hotLevel, userId, foodId, tags } = reviewDetails;
+  async createReview(
+    userId: string,
+    foodId: string,
+    tags: TASTE_TAG[],
+    hotLevel: HOT_LEVEL
+  ) {
     const review = new Review();
     const hotLevelId = produceHotLevelId(hotLevel);
     review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
