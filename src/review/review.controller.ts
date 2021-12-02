@@ -30,7 +30,6 @@ import { Repository, getRepository, In } from 'typeorm';
 @ApiTags('리뷰 API')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
-
   @Post('food')
   @ApiOperation({summary: '하나의 리뷰를 제출하는 API'})
   async createReview(
@@ -62,8 +61,8 @@ export class ReviewController {
       return this.reviewService.createReview(user, food, tasteReviews, hotLevelname);
     } catch(e) {
       throw new HttpException(
-        ERROR_MESSAGE.NOT_FOUND,
-        HttpStatus.NOT_FOUND
+        ERROR_MESSAGE.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR
       )
     }
   }
@@ -71,9 +70,30 @@ export class ReviewController {
   @Post('foods')
   @ApiOperation({summary: '여러개의 리뷰를 제출하는 API'})
   async createReviews(
-    @Body() createReviewsDto: CreateReviewsDto,
+    @Body() params: CreateReviewsDto,
   ): Promise<CreateReviewsResultDto> {
-    return this.reviewService.createReviews(createReviewsDto);
+    try{
+      const { userId, reviewList } = params;
+      const user = await getRepository(User).findOne(userId);
+      const reviews = await Promise.all(reviewList.map(async ({ foodId, hotLevel, tags }) => {
+        const review = new Review();
+        const hotLevelId = produceHotLevelId(hotLevel);
+        review.user = user
+        review.food = await getRepository(Food).findOne(foodId);
+        review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
+        review.tasteReviews = await getRepository(TasteTag).find({
+         name: In(tags),
+        });
+        return review
+      }));
+      return this.reviewService.createReviews(user, reviews);
+    } catch(e) {
+      throw new HttpException(
+        ERROR_MESSAGE.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      )
+    }
+    
   }
 
   @Get('food/:foodId')

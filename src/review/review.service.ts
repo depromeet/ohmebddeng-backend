@@ -46,25 +46,14 @@ export class ReviewService {
     };
   }
 
-  async createReviews(reviewsDetails: CreateReviewsDto) {
-    const { userId, reviewList } = reviewsDetails;
-
-    reviewList.map(async ({ foodId, hotLevel, tags }) => {
-      const review = new Review();
-      const hotLevelId = produceHotLevelId(hotLevel);
-
-      review.user = await getRepository(User).findOne(userId);
-      review.food = await getRepository(Food).findOne(foodId);
-      review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
-    review.tasteReviews = await getRepository(TasteTag).find({
-       name: In(tags),
-     });
-      return this.reviewRepository.save(review);
-    });
-
+  async createReviews(
+    user: User,
+    reviews: Review[]) {
+    
+    const result = await this.reviewRepository.save(reviews);
     return {
-      userId: userId,
-      reviewLength: reviewList.length,
+      userId: user.id,
+      reviewLength: reviews.length
     };
   }
 
