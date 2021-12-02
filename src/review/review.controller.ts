@@ -60,10 +60,14 @@ export class ReviewController {
       }
       return this.reviewService.createReview(user, food, tasteReviews, hotLevelname);
     } catch(e) {
-      throw new HttpException(
-        ERROR_MESSAGE.INTERNAL_SERVER_ERROR,
-        HttpStatus.INTERNAL_SERVER_ERROR
-      )
+      if (e.status == HttpStatus.NOT_FOUND || e.status == HttpStatus.BAD_REQUEST)
+        throw e
+      else{
+        throw new HttpException(
+          ERROR_MESSAGE.INTERNAL_SERVER_ERROR,
+          HttpStatus.INTERNAL_SERVER_ERROR
+        )
+      }
     }
   }
 
@@ -93,7 +97,6 @@ export class ReviewController {
         HttpStatus.INTERNAL_SERVER_ERROR
       )
     }
-    
   }
 
   @Get('food/:foodId')
