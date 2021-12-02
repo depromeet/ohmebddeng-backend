@@ -60,6 +60,7 @@ export class ReviewController {
       }
       return this.reviewService.createReview(user, food, tasteReviews, hotLevelname);
     } catch(e) {
+      // if-else 구문으로 잡아낸 오류의 경우 그대로 표시하고, 이외에 에러는 INTERNAL_SERVER_ERROR를 throw한다.
       if (e.status == HttpStatus.NOT_FOUND || e.status == HttpStatus.BAD_REQUEST)
         throw e
       else{
@@ -78,7 +79,7 @@ export class ReviewController {
   ): Promise<CreateReviewsResultDto> {
     try{
       const { userId, reviewList } = params;
-
+      //제대로된 request 값이 오지 않았을 경우 에러를 throw한다.
       if(!userId || !reviewList){
         throw new HttpException(
           ERROR_MESSAGE.BAD_REQUEST,
@@ -95,6 +96,7 @@ export class ReviewController {
         review.tasteReviews = await getRepository(TasteTag).find({
          name: In(tags),
         });
+        //각 배열을 순회하며 존재하지 않는 정보에 접근했을 경우 에러를 throw한다.
         if (!review.user || !review.food || !review.hotLevel || !review.tasteReviews){
           throw new HttpException(
             ERROR_MESSAGE.NOT_FOUND,
@@ -105,6 +107,7 @@ export class ReviewController {
       }));
       return this.reviewService.createReviews(user, reviews);
     } catch(e) {
+      // if-else 구문으로 잡아낸 오류의 경우 그대로 표시하고, 이외에 에러는 INTERNAL_SERVER_ERROR를 throw한다.
       if (e.status == HttpStatus.NOT_FOUND || e.status == HttpStatus.BAD_REQUEST)
         throw e
       else{
@@ -119,33 +122,47 @@ export class ReviewController {
   @Get('food/:foodId')
   @ApiOperation({summary: '음식 Id 기반 리뷰 조회 API'})
   async findReviewByfoodId(@Param() params): Promise<FindReviewDto[]> {
-    try{
       const reviews = await this.reviewService.findReviewByfoodId(params.foodId);
+
+      //존재하지 않는 음식의 리뷰를 요청했을 경우 에러를 throw한다.
       const food = await getRepository(Food).findOne(params.foodId);
-      
       if(!food){
         throw new HttpException(
           ERROR_MESSAGE.NOT_FOUND,
           HttpStatus.NOT_FOUND
         )
       }
+
       const result = Promise.all(reviews.map((review) => {
         const hotLevel = produceHotLevelString(review.hotLevel.id);
         return { ...review, hotLevel };
       }),)
 
     return result
-    } catch(e) {
-        throw e
-    }
   }
 
   @Get('user/:userId')
   @ApiOperation({summary: '사용자 Id 기반 리뷰 조회 API'})
-  findReviewsByUserId(
+  async findReviewsByUserId(
     @Param() params,
   ): Promise<(Omit<Review, 'hotLevel'> & { hotLevel: HOT_LEVEL })[]> {
-    return this.reviewService.findReviewsByUserId(params.userId);
+    const reviews = await this.reviewService.findReviewsByUserId(params.userId);
+
+    //존재하지 않는 유저의 리뷰를 요청했을 경우 에러를 throw한다.
+    const user = await getRepository(User).findOne(params.userId);
+    if(!user){
+      throw new HttpException(
+        ERROR_MESSAGE.NOT_FOUND,
+        HttpStatus.NOT_FOUND
+      )
+    }
+
+    const result = Promise.all(reviews.map((review) => {
+      const hotLevel = produceHotLevelString(review.hotLevel.id);
+      return { ...review, hotLevel };
+    })
+  );
+    return result
   }
 
   @Get('food/count/:foodId')

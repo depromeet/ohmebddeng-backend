@@ -94,12 +94,6 @@ export class ReviewService {
       ])
       .where('review.userId = :userId', { userId })
       .getMany()
-      .then((reviews) =>
-        reviews.map((review) => {
-          const hotLevel = produceHotLevelString(review.hotLevel.id);
-          return { ...review, hotLevel };
-        }),
-      );
   }
 
   async findReviewCountByFood(
