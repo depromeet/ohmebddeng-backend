@@ -78,6 +78,13 @@ export class ReviewController {
   ): Promise<CreateReviewsResultDto> {
     try{
       const { userId, reviewList } = params;
+
+      if(!userId || !reviewList){
+        throw new HttpException(
+          ERROR_MESSAGE.BAD_REQUEST,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       const user = await getRepository(User).findOne(userId);
       const reviews = await Promise.all(reviewList.map(async ({ foodId, hotLevel, tags }) => {
         const review = new Review();
@@ -88,14 +95,24 @@ export class ReviewController {
         review.tasteReviews = await getRepository(TasteTag).find({
          name: In(tags),
         });
+        if (!review.user || !review.food || !review.hotLevel || !review.tasteReviews){
+          throw new HttpException(
+            ERROR_MESSAGE.NOT_FOUND,
+            HttpStatus.NOT_FOUND,
+          );
+        }
         return review
       }));
       return this.reviewService.createReviews(user, reviews);
     } catch(e) {
-      throw new HttpException(
-        ERROR_MESSAGE.INTERNAL_SERVER_ERROR,
-        HttpStatus.INTERNAL_SERVER_ERROR
-      )
+      if (e.status == HttpStatus.NOT_FOUND || e.status == HttpStatus.BAD_REQUEST)
+        throw e
+      else{
+        throw new HttpException(
+          ERROR_MESSAGE.INTERNAL_SERVER_ERROR,
+          HttpStatus.INTERNAL_SERVER_ERROR
+        )
+      }
     }
   }
 
