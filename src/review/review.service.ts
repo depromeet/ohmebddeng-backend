@@ -49,7 +49,6 @@ export class ReviewService {
   async createReviews(
     user: User,
     reviews: Review[]) {
-    
     const result = await this.reviewRepository.save(reviews);
     return {
       userId: user.id,
@@ -75,12 +74,6 @@ export class ReviewService {
       ])
       .where('review.foodId = :foodId', { foodId })
       .getMany()
-      .then((reviews) =>
-        reviews.map((review) => {
-          const hotLevel = produceHotLevelString(review.hotLevel.id);
-          return { ...review, hotLevel };
-        }),
-      );
   }
 
   async findReviewsByUserId(userId: string) {

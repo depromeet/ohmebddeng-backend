@@ -118,8 +118,26 @@ export class ReviewController {
 
   @Get('food/:foodId')
   @ApiOperation({summary: '음식 Id 기반 리뷰 조회 API'})
-  findReviewByfoodId(@Param() params): Promise<FindReviewDto[]> {
-    return this.reviewService.findReviewByfoodId(params.foodId);
+  async findReviewByfoodId(@Param() params): Promise<FindReviewDto[]> {
+    try{
+      const reviews = await this.reviewService.findReviewByfoodId(params.foodId);
+      const food = await getRepository(Food).findOne(params.foodId);
+      
+      if(!food){
+        throw new HttpException(
+          ERROR_MESSAGE.NOT_FOUND,
+          HttpStatus.NOT_FOUND
+        )
+      }
+      const result = Promise.all(reviews.map((review) => {
+        const hotLevel = produceHotLevelString(review.hotLevel.id);
+        return { ...review, hotLevel };
+      }),)
+
+    return result
+    } catch(e) {
+        throw e
+    }
   }
 
   @Get('user/:userId')
