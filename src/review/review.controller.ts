@@ -38,7 +38,7 @@ export class ReviewController {
     try{
     const { hotLevel, userId, foodId, tags } = params
     // request 값이 잘못 되었을 때 404에러를 throw 합니다.
-    if(!hotLevel || !userId || !foodId || !tags){
+    if(!hotLevel || !userId || !foodId || tags.length<1 || tags.length > 5){
       throw new HttpException(
         ERROR_MESSAGE.BAD_REQUEST,
         HttpStatus.BAD_REQUEST,
@@ -88,6 +88,12 @@ export class ReviewController {
       }
       const user = await getRepository(User).findOne(userId);
       const reviews = await Promise.all(reviewList.map(async ({ foodId, hotLevel, tags }) => {
+        if (tags.length <1 || tags.length > 5){
+          throw new HttpException(
+            ERROR_MESSAGE.BAD_REQUEST,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
         const review = new Review();
         const hotLevelId = produceHotLevelId(hotLevel);
         review.user = user
