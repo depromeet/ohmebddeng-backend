@@ -33,8 +33,7 @@ export class FoodController {
   @ApiOperation({ summary: '리뷰할 음식 리스트를 가져오는 API' })
   async reviewFoodList(): Promise<Food> {
     try {
-      const food: Promise<Food> = this.foodService.findReviewFoods();
-      return food;
+      return this.foodService.findReviewFoods();
     } catch (e) {
       throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
@@ -44,8 +43,7 @@ export class FoodController {
   @ApiOperation({ summary: '테스트 음식 리스트를 가져오는 API' })
   async findTestFoodList(): Promise<Food[]> {
     try {
-      const foods: Promise<Food[]> = this.foodService.findTestFoods();
-      return foods;
+      return this.foodService.findTestFoods();
     } catch (e) {
       throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
@@ -60,15 +58,13 @@ export class FoodController {
     try {
       const foodLevel = await this.foodService.findFoodLevelByLevelId(level);
       const foodId = await this.foodService.inputFood(name, subName, foodLevel);
-      const food = this.foodService.setFoodCategory(
+      return this.foodService.setFoodCategory(
         name,
         subName,
         level,
         category,
         foodId,
       );
-
-      return food;
     } catch (e) {
       throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
@@ -84,8 +80,7 @@ export class FoodController {
       const { id: foodLevel } = await this.foodService.findUserLevelFoods(
         userLevel,
       );
-      const treeFood = this.foodService.findTreeFood(foodLevel);
-      return treeFood;
+      return this.foodService.findTreeFood(foodLevel);
     } catch (e) {
       throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
@@ -102,9 +97,7 @@ export class FoodController {
 
       if (userlevel.id === '5') userlevel.id = '4';
 
-      const food = await this.foodService.findFoodByUserLevel(userlevel);
-
-      return food;
+      return await this.foodService.findFoodByUserLevel(userlevel);
     } catch (e) {
       throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
@@ -117,7 +110,7 @@ export class FoodController {
   ): Promise<Omit<FindFoodDto, 'hotLevel'>> {
     const { foodId } = param;
     try {
-      const food = this.foodService
+      return this.foodService
         .findFoodByFoodId(foodId)
         .then(({ id, name, subName, imageUrl, logoImageUrl }) => ({
           id,
@@ -126,7 +119,6 @@ export class FoodController {
           imageUrl,
           logoImageUrl,
         }));
-      return food;
     } catch (e) {
       throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.BAD_REQUEST);
     }

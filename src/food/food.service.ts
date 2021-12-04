@@ -41,7 +41,7 @@ export class FoodService {
   }
 
   async findReviewFoods(): Promise<Food> {
-    return await this.foodRepository
+    return this.foodRepository
       .createQueryBuilder('food')
       .select([
         'food.id',
@@ -56,7 +56,7 @@ export class FoodService {
   }
 
   async findTestFoods(): Promise<Food[]> {
-    const foods: Food[] = await this.foodRepository
+    return this.foodRepository
       .createQueryBuilder('food')
       .select([
         'food.id',
@@ -68,19 +68,15 @@ export class FoodService {
       .where('food.isTest = true')
       .orderBy('RAND()')
       .getMany();
-
-    return foods;
   }
 
   async findFoodLevelByLevelId(level): Promise<FoodLevel> {
     // foodLevelId을 사용하여 foodLevel 정보를 가져옴
-    const foodLevel = await this.foodLevelRepository
+    return this.foodLevelRepository
       .createQueryBuilder('foodLevel')
       .select()
       .where('foodLevel.id = :level', { level })
       .getOne();
-
-    return foodLevel;
   }
 
   async inputFood(name, subName, foodLevel) {
@@ -193,17 +189,15 @@ export class FoodService {
 
   // 레벨 별 음식 정보를 가져 옵니다.
   async findUserLevelFoods(userLevel): Promise<FoodLevel> {
-    const foodLevel = await this.foodLevelRepository
+    return this.foodLevelRepository
       .createQueryBuilder('foodLevel')
       .leftJoinAndSelect('foodLevel.userLevel', 'userLevel')
       .where('foodLevel.userLevel = :userLevel', { userLevel })
       .getOne();
-
-    return foodLevel;
   }
 
   async findTreeFood(foodLevel): Promise<Food[]> {
-    const foods: Food[] = await this.foodRepository
+    return this.foodRepository
       .createQueryBuilder('food')
       .leftJoinAndSelect('food.foodLevel', 'foodLevel')
       .select(['food.id', 'food.name', 'food.subName', 'food.imageUrl'])
@@ -211,7 +205,6 @@ export class FoodService {
       .orderBy('RAND()')
       .limit(3)
       .getMany();
-    return foods;
   }
 
   async findUserLevel(userId): Promise<UserLevel> {
@@ -225,7 +218,7 @@ export class FoodService {
   }
 
   async findFoodByUserLevel(userlevel): Promise<Food> {
-    const food = await this.foodRepository
+    return this.foodRepository
       .createQueryBuilder('food')
       .leftJoinAndSelect('food.foodLevel', 'foodLevel')
       .select([
@@ -238,13 +231,12 @@ export class FoodService {
       .where('food.foodLevel = :foodLevel', { foodLevel: userlevel.id })
       .orderBy('RAND()')
       .getOne();
-    return food;
   }
 
   async findFoodByFoodId(
     foodId: string,
   ): Promise<Omit<FindFoodDto, 'hotLevel'>> {
-    const food = this.foodRepository
+    return this.foodRepository
       .createQueryBuilder('food')
       .select([
         'food.id',
@@ -255,6 +247,5 @@ export class FoodService {
       ])
       .where('food.id = :foodId', { foodId })
       .getOne();
-    return food;
   }
 }
