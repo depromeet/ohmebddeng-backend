@@ -35,10 +35,7 @@ export class FoodController {
     try {
       return this.foodService.findReviewFoods();
     } catch (e) {
-      throw new HttpException(
-        ERROR_MESSAGE.BAD_REQUEST,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -48,10 +45,7 @@ export class FoodController {
     try {
       return this.foodService.findTestFoods();
     } catch (e) {
-      throw new HttpException(
-        ERROR_MESSAGE.BAD_REQUEST,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -72,10 +66,7 @@ export class FoodController {
         foodId,
       );
     } catch (e) {
-      throw new HttpException(
-        ERROR_MESSAGE.BAD_REQUEST,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -91,10 +82,7 @@ export class FoodController {
       );
       return this.foodService.findTreeFood(foodLevel);
     } catch (e) {
-      throw new HttpException(
-        ERROR_MESSAGE.BAD_REQUEST,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -111,10 +99,7 @@ export class FoodController {
 
       return await this.foodService.findFoodByUserLevel(userlevel);
     } catch (e) {
-      throw new HttpException(
-        ERROR_MESSAGE.BAD_REQUEST,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -135,10 +120,7 @@ export class FoodController {
           logoImageUrl,
         }));
     } catch (e) {
-      throw new HttpException(
-        ERROR_MESSAGE.BAD_REQUEST,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
     }
   }
 }
