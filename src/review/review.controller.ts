@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { Review } from './entities/review.entity';
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -17,6 +26,7 @@ import {
 } from '@nestjs/swagger';
 import { HOT_LEVEL } from 'src/common/enums/hot-level';
 import { FindReviewCountDto } from './dto/find-review-count.dto';
+import { CreateFoodRequestDto } from './dto/create-food-request.dto';
 
 @Controller('review')
 @ApiTags('리뷰 API')
@@ -55,6 +65,18 @@ export class ReviewController {
     @Body() createReviewsDto: CreateReviewsDto,
   ): Promise<CreateReviewsResultDto> {
     return this.reviewService.createReviews(createReviewsDto);
+  }
+
+  @Post('food/request')
+  @ApiOperation({ summary: '사용자가 음식 추가 요청을 하는 API' })
+  async createFoodRequest(@Body() param: CreateFoodRequestDto): Promise<void> {
+    const { food } = param;
+    try {
+      await this.reviewService.createFoodRequest(food);
+      return;
+    } catch (e) {
+      throw new HttpException('', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get('food/:foodId')
