@@ -139,7 +139,9 @@ export class FoodService {
       if (!hotLevel) {
         // hotLevel 없고, category도 없는 경우
         if (!category) {
-          const query = this.foodRepository.createQueryBuilder('food');
+          const query = this.foodRepository
+            .createQueryBuilder('food')
+            .where('food.imageUrl is not null');
 
           return sortBy(query, sort)
             .take(size)
@@ -151,7 +153,8 @@ export class FoodService {
         const query = this.foodRepository
           .createQueryBuilder('food')
           .leftJoinAndSelect('food.categories', 'category')
-          .where('category.name = :categoryName', { categoryName: category });
+          .where('category.name = :categoryName', { categoryName: category })
+          .andWhere('food.imageUrl is not null');
 
         return sortBy(query, sort)
           .take(size)
@@ -167,7 +170,8 @@ export class FoodService {
         const query = this.foodRepository
           .createQueryBuilder('food')
           .leftJoinAndSelect('food.foodLevel', 'foodLevel')
-          .where('foodLevel.id = :hotLevelId', { hotLevelId });
+          .where('foodLevel.id = :hotLevelId', { hotLevelId })
+          .andWhere('food.imageUrl is not null');
 
         return sortBy(query, sort)
           .take(size)
@@ -179,7 +183,8 @@ export class FoodService {
         .leftJoinAndSelect('food.categories', 'category')
         .leftJoinAndSelect('food.foodLevel', 'foodLevel')
         .where('category.name = :categoryName', { categoryName: category })
-        .andWhere('foodLevel.id = :hotLevelId', { hotLevelId });
+        .andWhere('foodLevel.id = :hotLevelId', { hotLevelId })
+        .andWhere('food.imageUrl is not null');
 
       return sortBy(query, sort).take(size).getMany().then(produceFindFoodDto);
     } catch (e) {
