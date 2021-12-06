@@ -12,3 +12,9 @@ export class FindUserLevelDto {
   @ApiProperty({ description: '사용자 레벨 정보', type: () => UserLevel })
   userLevel: UserLevel;
 }
+
+export class FindUserLevelByUserIdDto {
+  @IsString()
+  @ApiProperty({ description: '사용자 ID' })
+  userId: string;
+}
