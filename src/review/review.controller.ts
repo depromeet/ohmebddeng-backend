@@ -27,6 +27,7 @@ import {
 import { HOT_LEVEL } from 'src/common/enums/hot-level';
 import { FindReviewCountDto } from './dto/find-review-count.dto';
 import { CreateFoodRequestDto } from './dto/create-food-request.dto';
+import { ERROR_MESSAGE } from '@common/enums/error-message';
 
 @Controller('review')
 @ApiTags('리뷰 API')
@@ -75,7 +76,10 @@ export class ReviewController {
       await this.reviewService.createFoodRequest(food);
       return;
     } catch (e) {
-      throw new HttpException('', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        ERROR_MESSAGE.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
