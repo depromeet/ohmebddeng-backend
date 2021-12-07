@@ -17,15 +17,20 @@ import {
   HotLevelCountType,
   TasteTagCountType,
 } from './dto/find-review-count.dto';
-import { produceTasteTagString, produceTasteTagId } from './utils/produceTasteTag';
+import {
+  produceTasteTagString,
+  produceTasteTagId,
+} from './utils/produceTasteTag';
 import { HOT_LEVEL } from 'src/common/enums/hot-level';
 import { TASTE_TAG } from 'src/common/enums/taste-tag';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class ReviewService {
   constructor(
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
+    private readonly httpService: HttpService,
   ) {}
 
   async createReview(reviewDetails: CreateReviewDto) {
@@ -60,7 +65,7 @@ export class ReviewService {
       review.tasteReviews = await getRepository(TasteTag).find({
         name: In(tags),
       });
-      
+
       return this.reviewRepository.save(review);
     });
 
@@ -68,6 +73,16 @@ export class ReviewService {
       userId: userId,
       reviewLength: reviewList.length,
     };
+  }
+
+  async createFoodRequest(food: string) {
+    return this.httpService
+      .post(process.env.SLACK_FOOD_RECOMMAND, {
+        text: `*음식 추가 요청*
+
+요청내용: ${food}`,
+      })
+      .subscribe();
   }
 
   async findReviewByfoodId(foodId: string) {
