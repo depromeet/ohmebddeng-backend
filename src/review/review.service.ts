@@ -32,7 +32,7 @@ export class ReviewService {
     return getRepository(User).findOne(userId);
   }
 
-  async getinfo(
+  async getInfo(
     userId: string,
     foodId: string,
     tags: string[],
