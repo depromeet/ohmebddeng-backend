@@ -38,20 +38,16 @@ export class ReviewController {
     try{
     const { hotLevel, userId, foodId, tags } = params
     // request 값이 잘못 되었을 때 404에러를 throw 합니다.
-    if(!hotLevel || !userId || !foodId || tags.length<1 || tags.length > 5){
-      throw new HttpException(
-        ERROR_MESSAGE.BAD_REQUEST,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-      const hotLevelId = produceHotLevelId(hotLevel);
-      const hotLevelname = await getRepository(FoodLevel).findOne(hotLevelId);
-      const user = await getRepository(User).findOne(userId);
-      const food = await getRepository(Food).findOne(foodId);
-      const tasteReviews = await getRepository(TasteTag).find({
-        name: In(tags),
-      });
-      // 존재하지 않는 정보에 접근했을 때 notFound error를 throw합니다.
+      if(!hotLevel || !userId || !foodId || tags.length<1 || tags.length > 5){
+        throw new HttpException(
+          ERROR_MESSAGE.BAD_REQUEST,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // getinfo로 DB에 접근하고, 존재하지 않는 정보에 접근했을 때 notFound error를 throw합니다.
+      const { user, food, tasteReviews, hotLevelname} = await this.reviewService.getinfo(userId, foodId, tags, hotLevel)
+      
       if(!hotLevelname || !user || !food || !tasteReviews){
         throw new HttpException(
           ERROR_MESSAGE.NOT_FOUND,
@@ -86,7 +82,8 @@ export class ReviewController {
           HttpStatus.BAD_REQUEST,
         );
       }
-      const user = await getRepository(User).findOne(userId);
+      const usera = await this.reviewService.getuser(userId);
+
       const reviews = await Promise.all(reviewList.map(async ({ foodId, hotLevel, tags }) => {
         if (tags.length <1 || tags.length > 5){
           throw new HttpException(
@@ -95,13 +92,11 @@ export class ReviewController {
           );
         }
         const review = new Review();
-        const hotLevelId = produceHotLevelId(hotLevel);
+        const { user, food, tasteReviews, hotLevelname} = await this.reviewService.getinfo(userId, foodId, tags, hotLevel)
         review.user = user
-        review.food = await getRepository(Food).findOne(foodId);
-        review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
-        review.tasteReviews = await getRepository(TasteTag).find({
-         name: In(tags),
-        });
+        review.food = food
+        review.hotLevel = hotLevelname
+        review.tasteReviews = tasteReviews
         //각 배열을 순회하며 존재하지 않는 정보에 접근했을 경우 에러를 throw한다.
         if (!review.user || !review.food || !review.hotLevel || !review.tasteReviews){
           throw new HttpException(
@@ -111,7 +106,7 @@ export class ReviewController {
         }
         return review
       }));
-      return this.reviewService.createReviews(user, reviews);
+      return this.reviewService.createReviews(usera, reviews);
     } catch(e) {
       // if-else 구문으로 잡아낸 오류의 경우 그대로 표시하고, 이외에 에러는 INTERNAL_SERVER_ERROR를 throw한다.
       if (e.status == HttpStatus.NOT_FOUND || e.status == HttpStatus.BAD_REQUEST)
