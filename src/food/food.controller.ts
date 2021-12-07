@@ -1,20 +1,20 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import {
-  ApiBody,
-  ApiCreatedResponse,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-  PickType,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { HttpException, HttpStatus } from '@nestjs/common';
+
+import { ERROR_MESSAGE } from '@common/enums/error-message';
+
 import { FoodService } from '@food/food.service';
 import { Food } from '@food/entities/food.entity';
 import { CreateFoodDto } from '@food/dto/create-food.dto';
 import { FindFoodsQueryDto } from '@food/dto/find-foods-query.dto';
-import { FindFoodDto, RandomFoodDto } from '@food/dto/find-food.dto';
+import {
+  FindFoodDto,
+  FindFoodInfoDto,
+  RandomFoodDto,
+} from '@food/dto/find-food.dto';
 import { FindUserLevelFoodDto } from '@food/dto/find-userLevel-food.dto';
+import { FindUserLevelByUserIdDto } from '@user/dto/find-user-level.dto';
 
 @Controller('food')
 @ApiTags('음식 API')
@@ -24,102 +24,103 @@ export class FoodController {
   }
 
   @Get()
-  @ApiOperation({
-    summary: '음식 리스트를 가져오는 API',
-    description: '사용자 id, category가 주어질 경우 그에 맞는 음식만 가져온다.',
-  })
-  @ApiQuery({
-    name: 'userId, category, hotLevel, sort, size',
-    description: 'userId, category, hotLevel, sort, size',
-    type: FindFoodsQueryDto,
-  })
-  @ApiResponse({ description: '음식 리스트', type: FindFoodDto })
+  @ApiOperation({ summary: '음식 리스트를 가져오는 API' })
   async findFoods(@Query() params: FindFoodsQueryDto): Promise<FindFoodDto[]> {
     return this.foodService.findFoods(params);
   }
 
   @Get('/reviews')
-  @ApiOperation({
-    summary: '리뷰할 음식 리스트를 가져오는 API',
-    description: '리뷰 할 음식 List을 가져온다.',
-  })
-  @ApiCreatedResponse({ description: '음식 list', type: Food })
+  @ApiOperation({ summary: '리뷰할 음식 리스트를 가져오는 API' })
   async reviewFoodList(): Promise<Food> {
-    return this.foodService.findReviewFoods();
+    try {
+      return this.foodService.findReviewFoods();
+    } catch (e) {
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
   }
 
   @Get('/tests')
-  @ApiOperation({
-    summary: '테스트 음식 리스트를 가져오는 API',
-    description: '테스트에 필요한 음식 리스트를 가져온다.',
-  })
-  @ApiCreatedResponse({ description: '음식 list', type: Food })
+  @ApiOperation({ summary: '테스트 음식 리스트를 가져오는 API' })
   async findTestFoodList(): Promise<Food[]> {
-    return this.foodService.findTestFoods();
+    try {
+      return this.foodService.findTestFoods();
+    } catch (e) {
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
   }
 
   @Post()
-  @ApiOperation({
-    summary: '음식 정보를 저장하는 API',
-    description: '새로운 음식 정보를 저장합니다.',
-  })
-  @ApiBody({ type: CreateFoodDto })
-  @ApiCreatedResponse({ description: '등록 된 음식 정보', type: CreateFoodDto })
+  @ApiOperation({ summary: '음식 정보를 저장하는 API' })
   async createFoodInfo(
     @Body() createFoodDto: CreateFoodDto,
   ): Promise<CreateFoodDto> {
-    return this.foodService.createFoodInfo(createFoodDto);
+    const { name, subName, level, category } = createFoodDto;
+    try {
+      const foodLevel = await this.foodService.findFoodLevelByLevelId(level);
+      const foodId = await this.foodService.inputFood(name, subName, foodLevel);
+      return this.foodService.setFoodCategory(
+        name,
+        subName,
+        level,
+        category,
+        foodId,
+      );
+    } catch (e) {
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
   }
 
   @Get('/tests/result')
-  @ApiOperation({
-    summary: '사용자 레벨별 음식 추천 API',
-    description: '사용자 레벨별 음식을 추천합니다.',
-  })
-  @ApiQuery({
-    name: 'userLevel',
-    type: FindUserLevelFoodDto,
-    description: '사용자 레벨',
-  })
-  @ApiCreatedResponse({ description: '레벨별 음식 정보', type: Food })
+  @ApiOperation({ summary: '사용자 레벨별 음식 추천 API' })
   async findUserLevelFoods(
     @Query() param: FindUserLevelFoodDto,
   ): Promise<Food[]> {
-    return this.foodService.findUserLevelFoods(param);
+    const { userLevel } = param;
+    try {
+      const { id: foodLevel } = await this.foodService.findUserLevelFoods(
+        userLevel,
+      );
+      return this.foodService.findTreeFood(foodLevel);
+    } catch (e) {
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
   }
 
   @Get('/random')
-  @ApiOperation({
-    summary: '음식 랜덤 추천 API',
-    description: '음식을 랜덤 추천합니다.',
-  })
-  @ApiQuery({ name: 'userId', type: String, description: '사용자 ID' })
-  @ApiResponse({ description: '레벨별 음식 정보', type: RandomFoodDto })
+  @ApiOperation({ summary: '음식 랜덤 추천 API' })
   async findRandomFood(
-    @Query() param: { userId: string },
+    @Query() param: FindUserLevelByUserIdDto,
   ): Promise<RandomFoodDto> {
-    return this.foodService.findRandomFoods(param.userId);
+    const { userId } = param;
+    try {
+      const userlevel = await this.foodService.findUserLevel(userId);
+
+      if (userlevel.id === '5') userlevel.id = '4';
+
+      return await this.foodService.findFoodByUserLevel(userlevel);
+    } catch (e) {
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
   }
 
   @Get(':foodId')
-  @ApiOperation({
-    summary: '음식id 기반으로 해당 음식의 데이터를 가져오는 API',
-    description: '음식 id가 주어진다. 해당 음식의 데이터를 가져온다.',
-  })
-  @ApiParam({ name: '음식 id', type: String })
-  @ApiResponse({
-    description: '음식 리스트',
-    type: PickType(FindFoodDto, [
-      'id',
-      'imageUrl',
-      'logoImageUrl',
-      'name',
-      'subName',
-    ]),
-  })
+  @ApiOperation({ summary: '음식id로 음식 정보를 가져오는 API' })
   async findFoodByFoodId(
-    @Param() param: { foodId: string },
+    @Param() param: FindFoodInfoDto,
   ): Promise<Omit<FindFoodDto, 'hotLevel'>> {
-    return this.foodService.findFoodByFoodId(param.foodId);
+    const { foodId } = param;
+    try {
+      return this.foodService
+        .findFoodByFoodId(foodId)
+        .then(({ id, name, subName, imageUrl, logoImageUrl }) => ({
+          id,
+          name,
+          subName,
+          imageUrl,
+          logoImageUrl,
+        }));
+    } catch (e) {
+      throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
   }
 }
