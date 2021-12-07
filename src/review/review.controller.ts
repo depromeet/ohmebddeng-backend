@@ -91,7 +91,7 @@ export class ReviewController {
           );
         }
         const review = new Review();
-        const { user, food, tasteReviews, hotLevelname} = await this.reviewService.getinfo(userId, foodId, tags, hotLevel)
+        const { user, food, tasteReviews, hotLevelname} = await this.reviewService.getInfo(userId, foodId, tags, hotLevel)
         review.user = user
         review.food = food
         review.hotLevel = hotLevelname
