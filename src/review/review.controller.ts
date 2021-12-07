@@ -46,7 +46,7 @@ export class ReviewController {
       }
 
       // getinfo로 DB에 접근하고, 존재하지 않는 정보에 접근했을 때 notFound error를 throw합니다.
-      const { user, food, tasteReviews, hotLevelname} = await this.reviewService.getinfo(userId, foodId, tags, hotLevel)
+      const { user, food, tasteReviews, hotLevelname} = await this.reviewService.getInfo(userId, foodId, tags, hotLevel)
       
       if(!hotLevelname || !user || !food || !tasteReviews){
         throw new HttpException(
@@ -82,7 +82,7 @@ export class ReviewController {
           HttpStatus.BAD_REQUEST,
         );
       }
-      const user = await this.reviewService.getuser(userId);
+      const { user }  = await this.reviewService.getInfo(userId)
       const reviews = await Promise.all(reviewList.map(async ({ foodId, hotLevel, tags }) => {
         if (tags.length <1 || tags.length > 5){
           throw new HttpException(
@@ -91,7 +91,7 @@ export class ReviewController {
           );
         }
         const review = new Review();
-        const { user, food, tasteReviews, hotLevelname} = await this.reviewService.getinfo(userId, foodId, tags, hotLevel)
+        const { user, food, tasteReviews, hotLevelname} = await this.reviewService.getInfo(userId, foodId, tags, hotLevel)
         review.user = user
         review.food = food
         review.hotLevel = hotLevelname
