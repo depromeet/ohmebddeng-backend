@@ -82,8 +82,7 @@ export class ReviewController {
           HttpStatus.BAD_REQUEST,
         );
       }
-      const usera = await this.reviewService.getuser(userId);
-
+      const user = await this.reviewService.getuser(userId);
       const reviews = await Promise.all(reviewList.map(async ({ foodId, hotLevel, tags }) => {
         if (tags.length <1 || tags.length > 5){
           throw new HttpException(
@@ -106,7 +105,7 @@ export class ReviewController {
         }
         return review
       }));
-      return this.reviewService.createReviews(usera, reviews);
+      return this.reviewService.createReviews(user, reviews);
     } catch(e) {
       // if-else 구문으로 잡아낸 오류의 경우 그대로 표시하고, 이외에 에러는 INTERNAL_SERVER_ERROR를 throw한다.
       if (e.status == HttpStatus.NOT_FOUND || e.status == HttpStatus.BAD_REQUEST)
