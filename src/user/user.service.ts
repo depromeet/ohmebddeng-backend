@@ -4,22 +4,9 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserLevel } from './entities/user_level.entity';
-import {
-  updateUserLevelDto,
-  TemporaryAnswer,
-} from './dto/create-user-level.dto';
 import { Food } from 'src/food/entities/food.entity';
 import { EvaluateUserLevel } from './utils/evaluate-user-level';
-import { FindUserLevelDto } from './dto/find-user-level.dto';
-
-interface IFoodLevel {
-  foodId: string;
-  foodLevelId: string;
-}
-import { FindAnonymousUserDto } from './dto/find-anonymous-user.dto';
-import { FindUserCountDto } from './dto/find-user-count.dto';
-import { FindUserCountQueryDto } from './dto/find-user-count-query.dto';
-import { FindUserResponseDto } from './dto/find-user.dto';
+import { Answer } from './dto/create-user-level.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -28,165 +15,93 @@ export class UserService {
 
     @InjectRepository(Food)
     private readonly foodRepository: Repository<Food>,
+
+    private readonly evaluateUserLevel: EvaluateUserLevel,
   ) {}
 
-  async createAnonymousUser(): Promise<FindAnonymousUserDto> {
+  /**
+   * 익명 사용자 생성 API
+   * @returns 생성된 사용자의 userId, anonymousId
+   */
+  async createAnonymousUser(): Promise<User> {
     const user = new User();
     user.anonymousId = uuidv4();
 
-    const { anonymousId, id: userId } = await this.userRepository.save(user);
-    return { anonymousId, userId };
+    return this.userRepository.save(user);
   }
+
   /**
    * 사용자 id를 기반으로 해당 사용자의 정보를 가져오는 API
    * @param userId 사용자 id를 param으로 받음
    * @returns 사용자 정보, 사용자 레벨 정보, 사용자의 리뷰 정보
    */
-  async findUser(
-    userId: string,
-  ): Promise<FindUserResponseDto | Omit<FindUserResponseDto, 'userLevel'>> {
-    const query = this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.userLevel', 'userLevel')
-      .leftJoinAndSelect('userLevel.userLevelDetail', 'userLevelDetail')
-      .where('user.id = :userId', { userId })
-      .getOne();
-
+  async findUser(userId: string): Promise<User> {
     return this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userLevel', 'userLevel')
       .leftJoinAndSelect('userLevel.userLevelDetail', 'userLevelDetail')
       .where('user.id = :userId', { userId })
-      .getOne()
-      .then((user) => {
-        // Return 타입 변경
-        // isDeleted, role을 빼고 보냄
-        const { userLevel, isDeleted, role, ...userRest } = user;
-
-        // 사용자가 레벨테스트를 진행하지 않아 레벨이 없을 경우, userRest return합니다
-        if (!userLevel) {
-          return userRest;
-        }
-
-        const {
-          id,
-          name,
-          imageUrl,
-          summary,
-          description,
-          userLevelDetail,
-          level,
-        } = userLevel;
-        const details = userLevelDetail.map(({ detail }) => detail);
-
-        return {
-          ...userRest,
-          userLevel: {
-            id,
-            name,
-            imageUrl,
-            summary,
-            description,
-            details,
-            level,
-          },
-        };
-      });
+      .getOne();
   }
 
-  async updateUserLevel(params: updateUserLevelDto): Promise<FindUserLevelDto> {
+  /**
+   * 사용자의 레벨을 결정합니다(create/update)
+   * @param userId 사용자 ID
+   * @param answers {음식 ID, 맵레벨평가}
+   * @param foodIds 평가한 음식 ID로 이루어진 배열
+   * @returns 사용자의 레벨을 포함한 사용자 정보
+   */
+  async updateUserLevel(
+    userId: string,
+    answers: Answer[],
+    foodIds: string[],
+  ): Promise<User> {
     let userLevel = new UserLevel();
 
-    const { userId, answers } = params;
-
-    // get each food level
-    const foodIds = answers.map(({ foodId }) => foodId);
-    const foods: IFoodLevel[] = await this.foodRepository
+    // 각 음식별로 음식레벨을 가져옴
+    const foods = await this.foodRepository
       .createQueryBuilder('food')
       .leftJoin('food.foodLevel', 'foodLevel')
       .select(['food.id', 'foodLevel.id'])
       .where('food.id IN (:...ids)', { ids: foodIds })
-      .getMany()
-      .then((foods) =>
-        foods.map(({ id: foodId, foodLevel }) => ({
-          //foodId, foodLevelId만 뽑아낸다.
-          foodId,
-          foodLevelId: foodLevel.id,
-        })),
-      );
+      .getMany();
 
-    /**
-     * EvaluateLevel에 필요한 형태로 foods와 answers 두 배열을 가공합니다.
-     * foods와 answers 두 배열을 합칩니다. 동일한 foodId를 기준으로 두 배열의 각 요소는 합쳐지게 됩니다. foodId는 제외합니다.
-     * @param foods foodId와 foodLeveLid로 이뤄진 배열
-     * @param answers foodId와 HOT_LEVEL로 이뤄진 배열
-     * @returns foods와 answers를 겹치는 foodId를 기준으로 요소를 합친 배열 { foodLevelId, hotLevelId }
-     */
-    const createEvaluateUserLevelParam = (
-      foods: IFoodLevel[],
-      answers: TemporaryAnswer[],
-    ) => {
-      return foods.map(({ foodId, foodLevelId }) => {
-        // answers에서 food와 foodId가 같은 요소를 탐색
-        const { hotLevel } = answers.find((answer) => answer.foodId === foodId);
+    // 사용자의 레벨을 알고리즘에 의해 결정함
+    userLevel.id = this.evaluateUserLevel
+      .evaluateLevel(foods, answers)
+      .toString();
 
-        // 응답(answer)에 일치하는 foodId가 있는 경우만 hotLevel과 foodLevelId를 반환되는 배열에 추가
-        return hotLevel && { hotLevel, foodLevelId };
-      });
-    };
-
-    // evaluate User Level
-    /**
-     * foodLevelId, hotLevel로 이루어진 배열을 만듭니다
-     */
-    const evaluateUserLevelParams = createEvaluateUserLevelParam(
-      foods,
-      answers,
-    );
-
-    const evaluateUserLevel = new EvaluateUserLevel(evaluateUserLevelParams);
-    userLevel.id = evaluateUserLevel.evaluateLevel().toString();
-
-    // save userLevel in DB
-    this.userRepository
+    // 사용자의 레벨을 DB에 저장함
+    await this.userRepository
       .createQueryBuilder()
       .update(User)
       .set({ userLevel })
       .where('id = :id', { id: userId })
       .execute();
 
-    // return userLevel
+    // 저장된 사용자 레벨과 정보를 DB에서 가져옴
     return this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.userLevel', 'userLevel')
       .select(['user.id', 'userLevel'])
       .where('user.id = :id', { id: userId })
-      .getOne()
-      .then(({ id: userId, userLevel }) => ({ userId, userLevel }));
+      .getOne();
   }
 
-  async findUserCount(param: FindUserCountQueryDto): Promise<FindUserCountDto> {
-    // query param이라 string으로만 받아짐.
-    const levelTestedOnly = param.levelTestedOnly === 'true';
-
+  /**
+   * 총 사용자 수/레벨테스트를 한 총 사용자 수를 가져오는 API
+   * @param levelTestedOnly boolean. 레벨테스트를 한 사용자만 가져오고 싶은 경우.
+   * @returns 사용자 수(number)
+   */
+  async findUserCount(levelTestedOnly: boolean): Promise<number> {
+    const query = this.userRepository.createQueryBuilder('user');
     if (levelTestedOnly) {
-      return this.userRepository
-        .createQueryBuilder('user')
+      return query
         .leftJoinAndSelect('user.userLevel', 'userLevel')
         .where('userLevel.id IS NOT NULL')
-        .getCount()
-        .then((count) => ({
-          count,
-          levelTestedOnly,
-        }));
+        .getCount();
     }
 
-    return this.userRepository
-      .createQueryBuilder('user')
-      .getCount()
-      .then((count) => ({
-        count,
-        levelTestedOnly,
-      }));
+    return query.getCount();
   }
 }
