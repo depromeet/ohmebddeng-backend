@@ -28,12 +28,11 @@ export class ReviewService {
     private reviewRepository: Repository<Review>,
   ) {}
 
-  async getuser(userId: string){
-    const user = await getRepository(User).findOne(userId);
-    return user
+  async getUser(userId: string){
+    return getRepository(User).findOne(userId);
   }
 
-  async getinfo(
+  async getInfo(
     userId: string,
     foodId: string,
     tags: string[],
