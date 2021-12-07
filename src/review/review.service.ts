@@ -27,29 +27,33 @@ export class ReviewService {
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
   ) {}
-
-  async getUser(userId: string){
-    return getRepository(User).findOne(userId);
-  }
-
+  
   async getInfo(
     userId: string,
-    foodId: string,
-    tags: string[],
-    hotLevel: HOT_LEVEL
+    foodId? : string,
+    tags?: string[],
+    hotLevel?: HOT_LEVEL
   ){
-    const hotLevelId = produceHotLevelId(hotLevel);
-    const hotLevelname = await getRepository(FoodLevel).findOne(hotLevelId);
-    const user = await getRepository(User).findOne(userId);
-    const food = await getRepository(Food).findOne(foodId);
-    const tasteReviews = await getRepository(TasteTag).find({
-      name: In(tags),
-    });
-    return {
-      user,
-      food,
-      tasteReviews,
-      hotLevelname
+    if (hotLevel && foodId && tags) {
+      const hotLevelId = produceHotLevelId(hotLevel);
+      const hotLevelname = await getRepository(FoodLevel).findOne(hotLevelId);
+      const food = await getRepository(Food).findOne(foodId);
+      const tasteReviews = await getRepository(TasteTag).find({
+        name: In(tags),
+      });
+      const user = await getRepository(User).findOne(userId);
+      return {
+        user,
+        food,
+        tasteReviews,
+        hotLevelname
+      }
+    }
+    else{
+      const user = await getRepository(User).findOne(userId);
+      return {
+        user
+      }
     }
   }
 
