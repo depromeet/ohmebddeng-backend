@@ -26,6 +26,36 @@ export class ReviewService {
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
   ) {}
+  
+  async getInfo(
+    userId: string,
+    foodId? : string,
+    tags?: string[],
+    hotLevel?: HOT_LEVEL
+  ){
+    if (hotLevel && foodId && tags) {
+      const hotLevelId = produceHotLevelId(hotLevel);
+      const hotLevelname = await getRepository(FoodLevel).findOne(hotLevelId);
+      const food = await getRepository(Food).findOne(foodId);
+      const tasteReviews = await getRepository(TasteTag).find({
+        name: In(tags),
+      });
+      const user = await getRepository(User).findOne(userId);
+      return {
+        user,
+        food,
+        tasteReviews,
+        hotLevelname
+      }
+    }
+    else{
+      const user = await getRepository(User).findOne(userId);
+      return {
+        user
+      }
+    }
+  }
+
   async createReview(
     user: User,
     food: Food,
