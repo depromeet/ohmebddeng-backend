@@ -37,10 +37,12 @@ export class ReviewService {
     if (userId && !hotLevel && !foodId && !tags) {
       const user = await getRepository(User).findOne(userId);
       return { user }
-    } else if (!userId && !hotLevel && foodId && !tags) {
+    } 
+    else if (!userId && !hotLevel && foodId && !tags) {
       const food = await getRepository(Food).findOne(foodId);
       return { food }
-    } else {
+    }
+    else {
       const hotLevelId = produceHotLevelId(hotLevel);
       const hotLevelname = await getRepository(FoodLevel).findOne(hotLevelId);
       const food = await getRepository(Food).findOne(foodId);

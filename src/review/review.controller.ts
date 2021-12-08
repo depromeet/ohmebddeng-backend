@@ -55,7 +55,7 @@ export class ReviewController {
 
       // getinfo로 DB에 접근하고, 존재하지 않는 정보에 접근했을 때 notFound error를 throw합니다.
       const { user, food, tasteReviews, hotLevelname} = await this.reviewService.getInfo(userId, foodId, tags, hotLevel)
-      
+
       if(!hotLevelname || !user || !food || !tasteReviews){
         throw new HttpException(
           ERROR_MESSAGE.NOT_FOUND,
@@ -65,7 +65,7 @@ export class ReviewController {
       return this.reviewService.createReview(user, food, tasteReviews, hotLevelname);
     } catch(e) {
       // if-else 구문으로 잡아낸 오류의 경우 그대로 표시하고, 이외에 에러는 INTERNAL_SERVER_ERROR를 throw한다.
-      if (e.status == HttpStatus.NOT_FOUND || e.status == HttpStatus.BAD_REQUEST)
+      if (e.status === HttpStatus.NOT_FOUND || e.status === HttpStatus.BAD_REQUEST)
         throw e
       else{
         throw new HttpException(
@@ -116,7 +116,7 @@ export class ReviewController {
       return this.reviewService.createReviews(user, reviews);
     } catch(e) {
       // if-else 구문으로 잡아낸 오류의 경우 그대로 표시하고, 이외에 에러는 INTERNAL_SERVER_ERROR를 throw한다.
-      if (e.status == HttpStatus.NOT_FOUND || e.status == HttpStatus.BAD_REQUEST)
+      if (e.status === HttpStatus.NOT_FOUND || e.status === HttpStatus.BAD_REQUEST)
         throw e
       else{
         throw new HttpException(
