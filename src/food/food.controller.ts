@@ -107,18 +107,12 @@ export class FoodController {
   @ApiOperation({ summary: '음식id로 음식 정보를 가져오는 API' })
   async findFoodByFoodId(
     @Param() param: FindFoodInfoDto,
-  ): Promise<Omit<FindFoodDto, 'hotLevel'>> {
+  ) : Promise<Omit<FindFoodDto, 'hotLevel'>> {
     const { foodId } = param;
     try {
-      return this.foodService
-        .findFoodByFoodId(foodId)
-        .then(({ id, name, subName, imageUrl, logoImageUrl }) => ({
-          id,
-          name,
-          subName,
-          imageUrl,
-          logoImageUrl,
-        }));
+      const { id, name, subName, imageUrl, logoImageUrl } = await this.foodService.findFoodByFoodId(foodId);
+      
+      return { id, name, subName, imageUrl, logoImageUrl } ;
     } catch (e) {
       throw new HttpException(ERROR_MESSAGE.NOT_FOUND, HttpStatus.NOT_FOUND);
     }
