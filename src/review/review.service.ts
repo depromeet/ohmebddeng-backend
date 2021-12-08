@@ -19,12 +19,12 @@ import { ERROR_MESSAGE } from 'src/common/enums/error-message';
 import { produceTasteTagString, produceTasteTagId } from './utils/produceTasteTag';
 import { produceHotLevelId, produceHotLevelString} from './utils/produce-hot-level';
 
-
 @Injectable()
 export class ReviewService {
   constructor(
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
+    private readonly httpService: HttpService,
   ) {}
   
   async getInfo(
@@ -83,6 +83,16 @@ export class ReviewService {
       userId: user.id,
       reviewLength: reviews.length
     };
+  }
+
+  async createFoodRequest(food: string) {
+    return this.httpService
+      .post(process.env.SLACK_FOOD_RECOMMAND, {
+        text: `*음식 추가 요청*
+
+요청내용: ${food}`,
+      })
+      .subscribe();
   }
 
   async findReviewByfoodId(foodId: string) {

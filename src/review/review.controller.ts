@@ -128,6 +128,21 @@ export class ReviewController {
     }
   }
 
+  @Post('food/request')
+  @ApiOperation({ summary: '사용자가 음식 추가 요청을 하는 API' })
+  async createFoodRequest(@Body() param: CreateFoodRequestDto): Promise<void> {
+    const { food } = param;
+    try {
+      await this.reviewService.createFoodRequest(food);
+      return;
+    } catch (e) {
+      throw new HttpException(
+        ERROR_MESSAGE.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   @Get('food/:foodId')
   @ApiOperation({summary: '음식 Id 기반 리뷰 조회 API'})
   async findReviewByfoodId(@Param() params): Promise<FindReviewDto[]> {
