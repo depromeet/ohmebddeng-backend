@@ -19,6 +19,7 @@ import { CreateReviewsDto } from './dto/create-reviews.dto';
 import { CreateReviewResultDto } from './dto/create-review-result.dto';
 import { CreateReviewsResultDto } from './dto/create-reviews-result.dto';
 import { FindReviewDto } from './dto/find-review.dto';
+import { CreateFoodRequestDto } from './dto/create-food-request.dto';
 import {
   ApiBody,
   ApiResponse,
@@ -31,9 +32,7 @@ import {
 import { HOT_LEVEL } from 'src/common/enums/hot-level';
 import { FindReviewCountDto } from './dto/find-review-count.dto';
 import { ERROR_MESSAGE } from '@common/enums/error-message';
-import { produceTasteTagString, produceTasteTagId } from './utils/produceTasteTag';
-import { produceHotLevelId, produceHotLevelString} from './utils/produce-hot-level';
-import { Repository, getRepository, In } from 'typeorm';
+import { produceHotLevelString} from './utils/produce-hot-level';
 
 @Controller('review')
 @ApiTags('리뷰 API')
@@ -149,7 +148,8 @@ export class ReviewController {
       const reviews = await this.reviewService.findReviewByfoodId(params.foodId);
 
       //존재하지 않는 음식의 리뷰를 요청했을 경우 에러를 throw한다.
-      const food = await getRepository(Food).findOne(params.foodId);
+      const { food } = await this.reviewService.getInfo(params.foodId)
+
       if(!food){
         throw new HttpException(
           ERROR_MESSAGE.NOT_FOUND,
@@ -173,7 +173,7 @@ export class ReviewController {
     const reviews = await this.reviewService.findReviewsByUserId(params.userId);
 
     //존재하지 않는 유저의 리뷰를 요청했을 경우 에러를 throw한다.
-    const user = await getRepository(User).findOne(params.userId);
+    const { user } = await this.reviewService.getInfo(params.userId)
     if(!user){
       throw new HttpException(
         ERROR_MESSAGE.NOT_FOUND,

@@ -7,6 +7,7 @@ import { Food } from '../food/entities/food.entity';
 import { TasteTag } from '../review/entities/taste_tag.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { Repository, getRepository, In } from 'typeorm';
 import {
   FindReviewCountDto,
@@ -28,12 +29,18 @@ export class ReviewService {
   ) {}
   
   async getInfo(
-    userId: string,
+    userId?: string,
     foodId? : string,
     tags?: string[],
     hotLevel?: HOT_LEVEL
   ){
-    if (hotLevel && foodId && tags) {
+    if (userId && !hotLevel && !foodId && !tags) {
+      const user = await getRepository(User).findOne(userId);
+      return { user }
+    } else if (!userId && !hotLevel && foodId && !tags) {
+      const food = await getRepository(Food).findOne(foodId);
+      return { food }
+    } else {
       const hotLevelId = produceHotLevelId(hotLevel);
       const hotLevelname = await getRepository(FoodLevel).findOne(hotLevelId);
       const food = await getRepository(Food).findOne(foodId);
@@ -46,12 +53,6 @@ export class ReviewService {
         food,
         tasteReviews,
         hotLevelname
-      }
-    }
-    else{
-      const user = await getRepository(User).findOne(userId);
-      return {
-        user
       }
     }
   }
