@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { CreateReviewsDto } from './dto/create-reviews.dto';
 import { Review } from './entities/review.entity';
@@ -7,23 +6,19 @@ import { User } from '../user/entities/user.entity';
 import { Food } from '../food/entities/food.entity';
 import { TasteTag } from '../review/entities/taste_tag.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { Repository, getRepository, In } from 'typeorm';
-import {
-  produceHotLevelId,
-  produceHotLevelString,
-} from './utils/produce-hot-level';
 import {
   FindReviewCountDto,
   HotLevelCountType,
   TasteTagCountType,
 } from './dto/find-review-count.dto';
-import {
-  produceTasteTagString,
-  produceTasteTagId,
-} from './utils/produceTasteTag';
 import { HOT_LEVEL } from 'src/common/enums/hot-level';
 import { TASTE_TAG } from 'src/common/enums/taste-tag';
-import { HttpService } from '@nestjs/axios';
+import { ERROR_MESSAGE } from 'src/common/enums/error-message';
+import { produceTasteTagString, produceTasteTagId } from './utils/produceTasteTag';
+import { produceHotLevelId, produceHotLevelString} from './utils/produce-hot-level';
 
 @Injectable()
 export class ReviewService {
@@ -32,46 +27,64 @@ export class ReviewService {
     private reviewRepository: Repository<Review>,
     private readonly httpService: HttpService,
   ) {}
+  
+  async getInfo(
+    userId?: string,
+    foodId? : string,
+    tags?: string[],
+    hotLevel?: HOT_LEVEL
+  ){
+    if (userId && !hotLevel && !foodId && !tags) {
+      const user = await getRepository(User).findOne(userId);
+      return { user }
+    } 
+    else if (!userId && !hotLevel && foodId && !tags) {
+      const food = await getRepository(Food).findOne(foodId);
+      return { food }
+    }
+    else {
+      const hotLevelId = produceHotLevelId(hotLevel);
+      const hotLevelname = await getRepository(FoodLevel).findOne(hotLevelId);
+      const food = await getRepository(Food).findOne(foodId);
+      const tasteReviews = await getRepository(TasteTag).find({
+        name: In(tags),
+      });
+      const user = await getRepository(User).findOne(userId);
+      return {
+        user,
+        food,
+        tasteReviews,
+        hotLevelname
+      }
+    }
+  }
 
-  async createReview(reviewDetails: CreateReviewDto) {
-    const { hotLevel, userId, foodId, tags } = reviewDetails;
+  async createReview(
+    user: User,
+    food: Food,
+    tags: TasteTag[],
+    hotLevel: FoodLevel
+  ) {
     const review = new Review();
-    const hotLevelId = produceHotLevelId(hotLevel);
-    review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
-    review.user = await getRepository(User).findOne(userId);
-    review.food = await getRepository(Food).findOne(foodId);
-    review.tasteReviews = await getRepository(TasteTag).find({
-      name: In(tags),
-    });
-
+    review.hotLevel = hotLevel
+    review.food = food
+    review.user = user
+    review.hotLevel = hotLevel
+    review.tasteReviews = tags
     const result = await this.reviewRepository.save(review);
-
     return {
       userId: result.user.id,
       foodId: result.food.id,
     };
   }
 
-  async createReviews(reviewsDetails: CreateReviewsDto) {
-    const { userId, reviewList } = reviewsDetails;
-
-    reviewList.map(async ({ foodId, hotLevel, tags }) => {
-      const review = new Review();
-      const hotLevelId = produceHotLevelId(hotLevel);
-
-      review.user = await getRepository(User).findOne(userId);
-      review.food = await getRepository(Food).findOne(foodId);
-      review.hotLevel = await getRepository(FoodLevel).findOne(hotLevelId);
-      review.tasteReviews = await getRepository(TasteTag).find({
-        name: In(tags),
-      });
-
-      return this.reviewRepository.save(review);
-    });
-
+  async createReviews(
+    user: User,
+    reviews: Review[]) {
+    const result = await this.reviewRepository.save(reviews);
     return {
-      userId: userId,
-      reviewLength: reviewList.length,
+      userId: user.id,
+      reviewLength: reviews.length
     };
   }
 
@@ -103,12 +116,6 @@ export class ReviewService {
       ])
       .where('review.foodId = :foodId', { foodId })
       .getMany()
-      .then((reviews) =>
-        reviews.map((review) => {
-          const hotLevel = produceHotLevelString(review.hotLevel.id);
-          return { ...review, hotLevel };
-        }),
-      );
   }
 
   async findReviewsByUserId(userId: string) {
@@ -129,12 +136,6 @@ export class ReviewService {
       ])
       .where('review.userId = :userId', { userId })
       .getMany()
-      .then((reviews) =>
-        reviews.map((review) => {
-          const hotLevel = produceHotLevelString(review.hotLevel.id);
-          return { ...review, hotLevel };
-        }),
-      );
   }
 
   async findReviewCountByFood(
