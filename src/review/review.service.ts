@@ -38,7 +38,7 @@ export class ReviewService {
       const user = await getRepository(User).findOne(userId);
       return { user }
     } 
-    else if (!userId && !hotLevel && foodId && !tags) {
+    else if (userId && !hotLevel && foodId && !tags) {
       const food = await getRepository(Food).findOne(foodId);
       return { food }
     }
