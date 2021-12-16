@@ -146,9 +146,8 @@ export class ReviewController {
   @ApiOperation({summary: '음식 Id 기반 리뷰 조회 API'})
   async findReviewByfoodId(@Param() params): Promise<FindReviewDto[]> {
       const reviews = await this.reviewService.findReviewByfoodId(params.foodId);
-
       //존재하지 않는 음식의 리뷰를 요청했을 경우 에러를 throw한다.
-      const { food } = await this.reviewService.getInfo(params.foodId)
+      const { food } = await this.reviewService.getInfo("1", params.foodId)
 
       if(!food){
         throw new HttpException(

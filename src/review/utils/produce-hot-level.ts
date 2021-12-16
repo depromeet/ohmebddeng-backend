@@ -14,6 +14,8 @@ export const produceHotLevelString = (hotLevelId: string) => {
       return HOT_LEVEL.HOT;
     case '4':
       return HOT_LEVEL.HOTTEST;
+    case '5':
+      return HOT_LEVEL.NEVER_TRIED;
     default:
       return HOT_LEVEL.NEVER_TRIED;
   }
@@ -33,6 +35,8 @@ export const produceHotLevelId = (hotLevel: HOT_LEVEL) => {
       return '3';
     case HOT_LEVEL.HOTTEST:
       return '4';
+    case HOT_LEVEL.NEVER_TRIED:
+      return '5';
     default:
       return '5';
   }
