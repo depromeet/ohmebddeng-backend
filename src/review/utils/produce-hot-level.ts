@@ -6,6 +6,8 @@ import { HOT_LEVEL } from 'src/common/enums/hot-level';
  */
 export const produceHotLevelString = (hotLevelId: string) => {
   switch (hotLevelId) {
+    case '0':
+      return HOT_LEVEL.NORMAL;
     case '1':
       return HOT_LEVEL.EASY;
     case '2':
@@ -25,6 +27,8 @@ export const produceHotLevelString = (hotLevelId: string) => {
  */
 export const produceHotLevelId = (hotLevel: HOT_LEVEL) => {
   switch (hotLevel) {
+    case HOT_LEVEL.NORMAL:
+      return '0';
     case HOT_LEVEL.EASY:
       return '1';
     case HOT_LEVEL.NORMAL:
